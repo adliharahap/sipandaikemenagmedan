@@ -536,7 +536,7 @@ const ChartCard = ({
               <DownloadIcon className="w-3 h-3" /> Download CSV
             </button>
         </div>
-        <div className="h-56 sm:h-64">
+        <div className="h-56 sm:h-64 min-w-0">
            {/* Pie Chart */}
            {currentView === 'pie' && chartType !== 'area' && chartType !== 'bar-only' && chartType !== 'penyuluh_agama' && (
                 <ResponsiveContainer width="100%" height="100%">
@@ -748,7 +748,7 @@ const DataKeagamaan = () => {
   const containerVariant = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 0.5, staggerChildren: 0.1 } } };
   const itemVariant = { hidden: { opacity: 0, y: 15 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } } };
   const chartSectionVariant = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 0.4, ease: 'easeOut', staggerChildren: 0.1 } }, exit: { opacity: 0, transition: { duration: 0.3, ease: 'easeIn' } } };
-  const backgroundStyle = theme === 'dark' ? { background: 'radial-gradient(circle at center top, #042f2e 0%, #021a1a 100%)' } : { background: 'radial-gradient(circle at center top, #f0fdfa 0%, #ccfbf1 100%)' };
+  const backgroundStyle = theme === 'dark' ? { background: 'radial-gradient(circle at center top, #210E37 0%, #3F1C80 50%)' } : { background: 'radial-gradient(circle at center top, #f0fdfa 0%, #ccfbf1 100%)' };
 
   return (
     <motion.div id="data-keagamaan" className="w-full min-h-screen py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden" style={backgroundStyle} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.05 }} variants={containerVariant} >

@@ -2,6 +2,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import Navbar from "../../components/Navbar";
 import { ThemeProvider } from "next-themes";
+import ClientProvider from "../../components/ClientProvider";
 
 const poppins = localFont({
   src: [
@@ -23,9 +24,10 @@ export default function RootLayout({ children }) {
       <body
         className={`${poppins.variable} font-poppins antialiased`}
       >
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-          <Navbar />
-          {children}
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem >
+          <ClientProvider>
+            {children}
+          </ClientProvider>
         </ThemeProvider>
       </body>
     </html>

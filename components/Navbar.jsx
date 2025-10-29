@@ -1,174 +1,149 @@
 "use client";
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence, delay, hover } from 'framer-motion';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from 'next-themes';
-import { MenuIcon, MoonIcon, SearchIcon, SunIcon, XIcon } from './SvgComponent/NavbarIcons';
+import { DashboardIcon, LoginIcon, LogoutIcon, MenuIcon, MoonIcon, SearchIcon, SunIcon, XIcon } from './SvgComponent/NavbarIcons';
+import { useSelector } from 'react-redux';
+import Link from 'next/link';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '../utils/firebase';
+import { handleLogout } from '../utils/handleLogOut';
 
+const ChevronDownIcon = ({ className }) => (
+  <svg
+    className={className}
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    stroke="currentColor"
+    strokeWidth="3"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M6 9L12 15L18 9"></path>
+  </svg>
+);
 
 const Navbar = () => {
   const [isSticky, setIsSticky] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { theme, setTheme } = useTheme();
+  const { user } = useSelector((state) => state.auth);
 
-  // --- AWAL PERUBAHAN ---
-  // State untuk mengelola dropdown yang sedang terbuka
-  const [openDropdown, setOpenDropdown] = useState(null); // Untuk desktop (hover)
-  const [openMobileDropdown, setOpenMobileDropdown] = useState(null); // Untuk mobile (click)
-  // --- AKHIR PERUBAHAN ---
+  const [openDropdown, setOpenDropdown] = useState(null);
+  const [openMobileDropdown, setOpenMobileDropdown] = useState(null);
 
-  // Scroll event untuk efek sticky
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+
+  useEffect(() => {
+    if (!user) {
+      setIsLoggedIn(false);
+    } else {
+      setIsLoggedIn(true);
+    }
+  }, [user]);
+
   useEffect(() => {
     const handleScroll = () => setIsSticky(window.scrollY > 10);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Fungsi toggle tema
   const toggleTheme = () => {
     setTheme(theme === "dark" ? "light" : "dark");
   };
 
-  // Fungsi toggle menu mobile
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen((prev) => !prev);
-    // Reset dropdown mobile saat menu utama ditutup
     if (isMobileMenuOpen) {
       setOpenMobileDropdown(null);
     }
   };
 
-  // --- AWAL PERUBAHAN ---
-  // Daftar menu dengan struktur dropdown
-  // Saya juga memperbaiki href yang duplikat
+  // --- AWAL PERUBAHAN: Fungsi Demo Autentikasi ---
+  const mockSignIn = (role) => {
+    setIsLoggedIn(true);
+    setUserRole(role);
+    setUserInfo({
+      name: role === 'user' ? 'User Biasa' : 'Pegawai Keren',
+      email: role === 'user' ? 'user@google.com' : 'pegawai@kemenag.go.id',
+      photoUrl: `https://placehold.co/40x40/${role === 'user' ? 'E2E8F0' : 'A7F3D0'}/333333?text=${role.charAt(0).toUpperCase()}`
+    });
+    setIsMobileMenuOpen(false); // Tutup menu mobile jika sign in dari sana
+    setIsProfileOpen(false); // Pastikan profile tertutup
+  };
+
+  const mockSignOut = () => {
+    setIsLoggedIn(false);
+    setUserRole(null);
+    setUserInfo(null);
+    setIsProfileOpen(false); // Tutup profile dropdown
+    setIsMobileMenuOpen(false); // Tutup menu mobile
+  };
+  // --- AKHIR PERUBAHAN: Fungsi Demo Autentikasi ---
+
+
   const menuItems = [
     { name: 'Beranda', href: '#beranda' },
     { name: 'Kependudukan', href: '#kependudukan' },
     {
-      name: 'Data Layanan', // Menu utama untuk dropdown
-      children: [ // Submenu
+      name: 'Data Layanan',
+      children: [
         { name: 'Data Keagamaan', href: '#data-keagamaan' },
         { name: 'Pendidikan Madrasah', href: '#pendidikan-madrasah' },
-        { name: 'Haji & Umrah', href: '#haji-umrah' },
         { name: 'Sertifikasi Halal', href: '#sertifikasi-halal' },
+        { name: 'Haji & Umrah', href: '#haji-umrah' },
       ]
     },
-    { name: 'Aparatur & Aset', href: '#aparatur-aset' },
+    { name: 'ASN & Non ASN', href: '#asn' },
   ];
-  // --- AKHIR PERUBAHAN ---
 
-
-  // Varian animasi untuk menu mobile (TIDAK BERUBAH)
+  // Varian animasi (Tidak Berubah)
   const mobileMenuContainerVariants = {
     hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.08,
-        delayChildren: 0.1,
-      },
-    },
-    exit: {
-      opacity: 0,
-      transition: {
-        when: "afterChildren",
-        staggerChildren: 0.05,
-        staggerDirection: -1,
-      }
-    }
+    visible: { opacity: 1, transition: { staggerChildren: 0.08, delayChildren: 0.1 } },
+    exit: { opacity: 0, transition: { when: "afterChildren", staggerChildren: 0.05, staggerDirection: -1 } }
   };
 
   const mobileMenuItemVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        type: "spring",
-        stiffness: 260,
-        damping: 18,
-      },
-    },
-    exit: {
-      opacity: 0,
-      y: 20,
-      transition: {
-        duration: 0.1
-      }
-    }
+    visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 260, damping: 18 } },
+    exit: { opacity: 0, y: 20, transition: { duration: 0.1 } }
   };
 
-  // --- VARIAN BARU UNTUK MENU DESKTOP ---
-  // Varian untuk container menu desktop (TIDAK BERUBAH)
   const desktopMenuContainerVariants = {
     hidden: { opacity: 1 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.10,
-        delayChildren: 0.1,
-      },
-    },
+    visible: { opacity: 1, transition: { staggerChildren: 0.10, delayChildren: 0.1 } },
   };
 
-  // Varian untuk item menu desktop (TIDAK BERUBAH)
   const desktopMenuItemVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        type: "spring",
-        stiffness: 260,
-        damping: 18,
-      },
-    },
-    exit: {
-      opacity: 0,
-      y: 20,
-      transition: {
-        duration: 0.1
-      }
-    }
+    visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 260, damping: 18 } },
+    exit: { opacity: 0, y: 20, transition: { duration: 0.1 } }
   };
-  // --- END VARIAN BARU ---
-
-  // Komponen Ikon Chevron (untuk dropdown)
-  const ChevronDownIcon = ({ className }) => (
-    <svg
-      className={className}
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      stroke="currentColor"
-      strokeWidth="3"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M6 9L12 15L18 9"></path>
-    </svg>
-  );
 
 
   return (
     <>
       <motion.nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isSticky
+        className={`fixed top-0 left-0 right-0 z-90 transition-all duration-300 ${isSticky
           ? "shadow-lg bg-[#FDFAF6]/80 dark:bg-[#0D1B13]/80 backdrop-blur-sm"
           : "bg-transparent"
           }`}
       >
         <div className="px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
-            {/* Logo (Tidak berubah) */}
+            {/* Logo */}
             <motion.a
               href="#beranda"
               className="flex items-center gap-3"
               whileHover={{ scale: 1.05 }}
             >
               <img
-                src='/logo3.png' // Pastikan path ini benar
+                src='/logo3.png'
                 alt='kemenag-logo'
                 className='h-10 w-10'
                 onError={(e) => { e.currentTarget.style.display = 'none'; }} // Fallback jika logo error
@@ -179,8 +154,7 @@ const Navbar = () => {
               </span>
             </motion.a>
 
-            {/* --- AWAL PERUBAHAN Menu Desktop --- */}
-            {/* Mengganti logika map untuk mendukung dropdown */}
+            {/* Menu Desktop */}
             <motion.div
               className="hidden md:flex items-center space-x-6"
               variants={desktopMenuContainerVariants}
@@ -189,16 +163,16 @@ const Navbar = () => {
             >
               {menuItems.map((item) => (
                 item.children ? (
-                  // --- INI ADALAH DROPDOWN ---
+                  // --- DROPDOWN LAYANAN ---
                   <motion.div
                     key={item.name}
                     className="relative"
                     onMouseEnter={() => setOpenDropdown(item.name)}
                     onMouseLeave={() => setOpenDropdown(null)}
-                    variants={desktopMenuItemVariants} // Menerapkan animasi per item
+                    variants={desktopMenuItemVariants}
                   >
                     <button
-                      className={`relative group font-medium ${isSticky ? "text-[#191818]" : "text-[#E4EFE7]"} dark:text-[#E4EFE7] hover:text-[#ffffff] dark:hover:text-[#ffffff] hover:scale-110 transition-all duration-300 ease-in-out flex items-center gap-1.5`}
+                      className={`relative group font-medium ${isSticky ? "text-[#191818]" : "text-[#E4EFE7]"} dark:text-[#E4EFE7] hover:text-[#064420] dark:hover:text-[#ffffff] hover:scale-110 transition-all duration-300 ease-in-out flex items-center gap-1.5`}
                     >
                       {item.name}
                       <ChevronDownIcon className="w-4 h-4 transition-transform duration-200 group-hover:rotate-180" />
@@ -230,41 +204,46 @@ const Navbar = () => {
                     </AnimatePresence>
                   </motion.div>
                 ) : (
-                  // --- INI ADALAH LINK BIASA ---
+                  // --- LINK BIASA ---
                   <motion.a
                     key={item.name}
                     href={item.href}
-                    className={`relative group font-medium ${isSticky ? "text-[#191818]" : "text-[#E4EFE7]"} dark:text-[#E4EFE7] hover:text-[#ffffff] dark:hover:text-[#ffffff] hover:scale-110 transition-all duration-300 ease-in-out`}
+                    className={`relative group font-medium ${isSticky ? "text-[#191818]" : "text-[#E4EFE7]"} dark:text-[#E4EFE7] hover:text-[#064420] dark:hover:text-[#ffffff] hover:scale-110 transition-all duration-300 ease-in-out`}
                     variants={desktopMenuItemVariants}
                   >
                     {item.name}
-                    <span className="block max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 bg-[#A7F3D0] dark:bg-[#A7F3D0]"></span>
+                    <span className="absolute -bottom-0.5 left-0 block max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 bg-[#A7F3D0] dark:bg-[#A7F3D0]"></span>
                   </motion.a>
                 )
               ))}
             </motion.div>
-            {/* --- AKHIR PERUBAHAN Menu Desktop --- */}
 
-
-            {/* Tombol kanan (Tidak berubah) */}
+            {/* Tombol kanan (Auth, Tema, Burger) */}
             <div className="flex items-center gap-2 sm:gap-4">
-              {/* Search Field (Desktop) */}
-              <div className="hidden md:flex relative items-center">
-                <input
-                  type="text"
-                  placeholder="Cari..."
-                  className="pl-4 pr-10 py-2 w-32 sm:w-48 rounded-full bg-[#FAF1E6] dark:bg-[#1F2922] text-[#064420] dark:text-[#E4EFE7] placeholder:text-[#064420]/70 dark:placeholder:text-[#E4EFE7]/70 focus:outline-none focus:ring-2 focus:ring-[#064420] dark:focus:ring-[#E4EFE7] transition-all duration-300"
-                />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[#064420] dark:text-[#E4EFE7] pointer-events-none">
-                  <SearchIcon className="w-5 h-5" />
-                </span>
-              </div>
 
-              {/* Dark mode toggle */}
+              {/* --- AWAL PERUBAHAN: Tombol Kanan Dinamis --- */}
+
+              {!isLoggedIn && (
+                <>
+                  {/* TOMBOL SIGN IN (Hanya tampil jika BELUM login) */}
+                  {/* --- AWAL PERUBAHAN: Mengganti 2 tombol teks menjadi 1 tombol ikon --- */}
+                  <Link
+                    href="/login"
+                    className={`p-2 rounded-full ${isSticky ? 'text-[#064420]' : 'text-[#E4EFE7]'
+                      } dark:text-[#E4EFE7] hover:bg-[#FAF1E6]/40 dark:hover:bg-[#1F2922] transition-colors`}
+                    title="Sign In"
+                  >
+                    <LoginIcon className="w-6 h-6" />
+                  </Link>
+                  {/* --- AKHIR PERUBAHAN: Mengganti 2 tombol teks menjadi 1 tombol ikon --- */}
+                </>
+              )}
+
+              {/* Dark mode toggle (Selalu tampil) */}
               <motion.button
                 onClick={toggleTheme}
                 whileTap={{ scale: 0.9, rotate: 15 }}
-                className={`p-2 rounded-full ${isSticky ? 'text-[#064420]' : 'text-[#E4EFE7]' // Warna dinamis untuk light mode
+                className={`p-2 rounded-full ${isSticky ? 'text-[#064420]' : 'text-[#E4EFE7]'
                   } dark:text-[#E4EFE7] hover:bg-[#FAF1E6]/40 dark:hover:bg-[#1F2922] transition-colors`}
               >
                 {theme === "dark" ? (
@@ -274,12 +253,97 @@ const Navbar = () => {
                 )}
               </motion.button>
 
+              {isLoggedIn && (
+                <>
+                  {/* PROFILE DROPDOWN (Hanya tampil jika SUDAH login) */}
+                  <div className="relative">
+                    <motion.button
+                      onClick={() => setIsProfileOpen((prev) => !prev)}
+                      whileTap={{ scale: 0.9 }}
+                      className="rounded-full overflow-hidden hidden md:block w-6.5 h-6.5 ring-2 ring-offset-2 ring-offset-[#FDFAF6] dark:ring-offset-[#0D1B13] ring-[#A7F3D0] dark:ring-[#064420]"
+                    >
+                      <img
+                        src={user?.photoURL}
+                        alt="User profile"
+                        className="w-full h-full object-cover"
+                        onError={(e) => { e.currentTarget.src = 'https://placehold.co/40x40/cccccc/333333?text=Err'; }} // Fallback jika Gagal load
+                      />
+                    </motion.button>
+
+                    <AnimatePresence>
+                      {isProfileOpen && (
+                        <motion.div
+                          className="absolute top-full right-0 mt-3 w-64 rounded-lg shadow-lg bg-[#FDFAF6] dark:bg-[#0D1B13] ring-1 ring-black ring-opacity-5 p-2"
+                          initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                          transition={{ duration: 0.2, ease: "easeInOut" }}
+                          // Tambahkan onMouseLeave jika ingin menutup saat mouse pergi
+                          onMouseLeave={() => setIsProfileOpen(false)}
+                        >
+                          <div className="flex flex-col">
+                            {/* Header Info Profile */}
+                            <div className="flex items-center gap-3 px-3 py-2 border-b border-gray-200 dark:border-gray-700">
+                              <img
+                                src={user?.photoURL}
+                                alt="User profile"
+                                className="w-10 h-10 rounded-full object-cover"
+                              />
+                              <div className="overflow-hidden">
+                                <p className="text-sm font-medium text-[#064420] dark:text-[#E4EFE7] truncate">{user?.name}</p>
+                                <p className="text-xs text-gray-600 dark:text-gray-400 truncate">{user?.email}</p>
+                              </div>
+                            </div>
+
+                            {isLoggedIn && (
+                              <>
+                                {(
+                                  (user?.role === "admin" ||
+                                    user?.role === "owner" ||
+                                    user?.role === "pegawai")
+                                  && user?.status === "verified"
+                                ) && (
+                                    <div className="p-1 mt-1">
+                                      <Link
+                                        href="/admin"
+                                        className={`w-full flex items-center gap-3 px-3 py-2 text-sm rounded-md ${isSticky ? 'text-[#064420]' : 'text-[#E4EFE7]'
+                                          } dark:text-[#E4EFE7] hover:bg-[#FAF1E6]/40 dark:hover:bg-[#1F2922] transition-colors`}
+                                        title="Go to Dashboard"
+                                      >
+                                        <DashboardIcon className="w-6 h-6" />
+                                        <span>Go To Dashboard</span>
+                                      </Link>
+                                    </div>
+                                  )}
+                              </>
+                            )}
+
+                            {/* Tombol Logout */}
+                            <div className="p-1 mt-1">
+                              <button
+                                onClick={handleLogout}
+                                className="w-full flex items-center gap-3 px-3 py-2 text-sm rounded-md text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                              >
+                                <LogoutIcon className="w-5 h-5" />
+                                <span>Log Out</span>
+                              </button>
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </>
+              )}
+              {/* --- AKHIR PERUBAHAN: Tombol Kanan Dinamis --- */}
+
+
               {/* Burger menu */}
               <div className="md:hidden">
                 <motion.button
                   onClick={toggleMobileMenu}
                   whileTap={{ scale: 0.9 }}
-                  className="p-2 rounded-md text-[#064420] dark:text-[#E4EFE7] hover:bg-[#FAF1E6] dark:hover:bg-[#1F2922] transition-colors"
+                  className={`p-2 rounded-md ${isSticky ? 'text-[#064420]' : 'text-[#E4EFE7]'} dark:text-[#E4EFE7] hover:bg-[#FAF1E6] dark:hover:bg-[#1F2922] transition-colors`}
                 >
                   {isMobileMenuOpen ? (
                     <XIcon className="w-6 h-6" />
@@ -293,12 +357,11 @@ const Navbar = () => {
         </div>
       </motion.nav>
 
-      {/* --- AWAL PERUBAHAN Menu Mobile --- */}
-      {/* Mengganti logika map untuk mendukung dropdown accordion */}
+      {/* --- Menu Mobile (Dengan tombol Sign In/Out) --- */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
-            className="fixed inset-0 z-90 pt-20 bg-[#FDFAF6] dark:bg-[#0a0111] md:hidden overflow-y-auto" // Tambah overflow-y-auto
+            className="fixed inset-0 z-80 pt-20 bg-[#FDFAF6] dark:bg-[#0a0111] md:hidden overflow-y-auto"
             variants={mobileMenuContainerVariants}
             initial="hidden"
             animate="visible"
@@ -307,7 +370,7 @@ const Navbar = () => {
             <div className="flex flex-col items-center pt-12 pb-24 space-y-8">
               {menuItems.map((item) => (
                 item.children ? (
-                  // --- INI ADALAH ACCORDION MOBILE ---
+                  // --- ACCORDION MOBILE ---
                   <motion.div key={item.name} className="w-full text-center" variants={mobileMenuItemVariants}>
                     <button
                       onClick={() => setOpenMobileDropdown(openMobileDropdown === item.name ? null : item.name)}
@@ -334,7 +397,7 @@ const Navbar = () => {
                             <motion.a
                               key={child.name}
                               href={child.href}
-                              onClick={() => setIsMobileMenuOpen(false)} // Tetap tutup menu utama
+                              onClick={() => setIsMobileMenuOpen(false)}
                               className="text-lg font-medium text-gray-700 dark:text-gray-400"
                               initial={{ opacity: 0, y: -10 }}
                               animate={{ opacity: 1, y: 0 }}
@@ -349,7 +412,7 @@ const Navbar = () => {
                     </AnimatePresence>
                   </motion.div>
                 ) : (
-                  // --- INI ADALAH LINK BIASA MOBILE ---
+                  // --- LINK BIASA MOBILE ---
                   <motion.a
                     key={item.name}
                     href={item.href}
@@ -361,13 +424,57 @@ const Navbar = () => {
                   </motion.a>
                 )
               ))}
+
+              {/* --- AWAL PERUBAHAN: Tombol Auth di Mobile Menu --- */}
+              <div className="pt-8 border-t border-gray-200 dark:border-gray-700 w-3/4 flex flex-col items-center gap-4">
+                {!isLoggedIn ? (
+                  <>
+                    <motion.button
+                      onClick={() => mockSignIn('user')}
+                      variants={mobileMenuItemVariants}
+                      className="w-full max-w-xs px-6 py-3 rounded-full text-lg font-medium bg-[#A7F3D0] text-[#064420]"
+                    >
+                      Sign In
+                    </motion.button>
+                  </>
+                ) : (
+                  <motion.div className="flex flex-col items-center gap-4" variants={mobileMenuItemVariants}>
+                    {/* Profile */}
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={user?.photoURL}
+                        alt="Profile"
+                        className="w-24 h-24 rounded-full object-cover border border-[#FAF1E6]"
+                      />
+                    </div>
+                    <div className="text-center">
+                        <p className="font-semibold text-[#064420] dark:text-[#E4EFE7]">
+                          {user?.name}
+                        </p>
+                        <p className="text-sm text-[#5B7065] dark:text-gray-400">
+                          {user?.email}
+                        </p>
+                    </div>
+
+                    {/* Logout Button */}
+                    <motion.button
+                      onClick={handleLogout}
+                      className="w-full max-w-xs px-6 py-3 rounded-full text-lg font-medium bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400"
+                    >
+                      Log Out
+                    </motion.button>
+                  </motion.div>
+                )}
+              </div>
+              {/* --- AKHIR PERUBAHAN: Tombol Auth di Mobile Menu --- */}
+
             </div>
           </motion.div>
         )}
       </AnimatePresence>
-      {/* --- AKHIR PERUBAHAN Menu Mobile --- */}
     </>
   );
 };
 
 export default Navbar;
+

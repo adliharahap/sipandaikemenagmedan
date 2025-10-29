@@ -378,7 +378,7 @@ const Kependudukan = () => {
 
               {/* Chart */}
               <motion.div 
-                className="w-full h-[400px] sm:h-[500px]"
+                className="w-full h-[400px] sm:h-[500px] min-w-0"
                 variants={itemVariant}
               >
                 <ResponsiveContainer width="100%" height="100%">
@@ -552,7 +552,7 @@ const Kependudukan = () => {
 
           {/* Chart Wilayah */}
           <motion.div 
-            className="w-full h-[400px] sm:h-[500px]"
+            className="w-full h-[400px] sm:h-[500px] min-w-0"
             variants={itemVariant}
           >
             <ResponsiveContainer width="100%" height="100%">

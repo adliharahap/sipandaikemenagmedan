@@ -38,27 +38,7 @@ const BookOpenIcon = (props) => (
     <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18c-2.305 0-4.408.867-6 2.292m0-14.25v14.25" />
   </svg>
 );
-// --- AWAL PENAMBAHAN IKON ---
-const EducationIcon = (props) => (
-  <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5z" />
-  </svg>
-);
-const CommunityIcon = (props) => (
-  <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m-7.519 2.27A9.094 9.094 0 0112 18.72a9.094 9.094 0 01-3.741-.479 3 3 0 00-4.682-2.72m7.519 2.27c.459.083.92.146 1.395.192 1.02.087 2.07.14 3.15.14 1.08 0 2.13-.053 3.15-.14a2.25 2.25 0 011.664 2.284 2.25 2.25 0 01-1.664 2.284c-1.02.087-2.07.14-3.15.14-1.08 0-2.13-.053-3.15-.14a2.25 2.25 0 01-1.664-2.284 2.25 2.25 0 011.664-2.284zM12 14.25a3 3 0 100-6 3 3 0 000 6z" />
-  </svg>
-);
-const BuildingIcon = (props) => (
-  <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h6m-6 3h6m-6 3h6m-6 3h6m-6 3h6M6 6.75h.75m-.75 3h.75m-.75 3h.75m-.75 3h.75m-.75 3h.75M17.25 6.75h.75m-.75 3h.75m-.75 3h.75m-.75 3h.75m-.75 3h.75" />
-  </svg>
-);
-const ServiceIcon = (props) => (
-  <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c.24 0 .468.02.69.055M12 21c-.24 0-.468.02-.69.055M12 3.82a9 9 0 01.69.055M12 3.82a9 9 0 00-.69.055M12 3.82c.24 0 .468.02.69.055M12 3.82c-.24 0-.468.02-.69.055M12 6.32a9 9 0 01.69.055M12 6.32a9 9 0 00-.69.055M12 6.32c.24 0 .468.02.69.055M12 6.32c-.24 0-.468.02-.69.055M16.5 9.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />
-  </svg>
-);
+
 const DownloadIcon = (props) => (
   <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
@@ -330,7 +310,7 @@ const ChartAndTableCard = ({
       </div>
 
       {/* Kontainer Chart */}
-      <div className="h-64 sm:h-80">
+      <div className="h-64 sm:h-80 min-w-0">
         {children}
       </div>
     </motion.div>
@@ -388,7 +368,7 @@ const CustomTooltip = ({ active, payload, label, theme, chartType = 'bar' }) => 
 };
 
 // --- 8. Komponen Utama Aparatur & Aset ---
-const AparaturDanAset = () => {
+const AsnDanNonASN = () => {
   const { theme } = useTheme();
   const [filter, setFilter] = useState('ringkasan'); // 'ringkasan', 'pensiun', 'naikpangkat', 'lain'
   const textLabelColor = theme === 'dark' ? '#D1D5DB' : '#374151';
@@ -426,7 +406,7 @@ const AparaturDanAset = () => {
 
   return (
     <motion.div 
-      id="aparatur-aset" // ID untuk navigasi
+      id="asn" // ID untuk navigasi
       className={`w-full min-h-screen py-24 px-4 sm:px-6 lg:px-8 ${theme === "dark" ? "bg-[#210F37]" : "bg-[#E4EFE7]"}`}
       initial="hidden"
       whileInView="visible"
@@ -440,7 +420,7 @@ const AparaturDanAset = () => {
           variants={itemVariant}
         >
           <h2 className={`text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r ${theme === 'dark' ? 'from-sky-400 to-blue-500' : 'from-sky-600 to-blue-800'}`}>
-            Aparatur & Aset
+            ASN & Non ASN
           </h2>
           <p className={`mt-4 text-lg max-w-2xl mx-auto ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
             Data komprehensif mengenai Aparatur Sipil Negara (ASN) dan Satuan Kerja di lingkungan Kemenag Kota Medan.
@@ -977,5 +957,5 @@ const AparaturDanAset = () => {
   );
 }
 
-export default AparaturDanAset;
+export default AsnDanNonASN;
 

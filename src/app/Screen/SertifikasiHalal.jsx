@@ -154,7 +154,7 @@ const ChartCard = ({ title, children, csvData, csvFilename, csvColumns, classNam
           </button>
           {/* --- AKHIR PERUBAHAN --- */}
         </div>
-        <div className="h-56 sm:h-64"> {children} </div>
+        <div className="h-56 sm:h-64 min-w-0"> {children} </div>
       </div>
     </motion.div>
   );

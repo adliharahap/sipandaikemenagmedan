@@ -511,7 +511,7 @@ const ChartCardPendidikan = ({
                         <DownloadIcon className="w-3.5 h-3.5" /> Download CSV
                     </button>
                 </div>
-                <div className="h-72 sm:h-80"> {/* Increased height */}
+                <div className="h-72 sm:h-80 min-w-0"> {/* Increased height */}
                     <ResponsiveContainer width="100%" height="100%">
                         <ComposedChart data={data} margin={{ top: 5, right: 5, left: -25, bottom: 40 }}> {/* Adjusted margins */}
                             <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
@@ -675,7 +675,7 @@ const PendidikanMadrasah = () => {
     const itemVariant = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.25, 1, 0.5, 1] } } }; // Smooth ease
     const sectionVariant = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 0.5, ease: 'easeInOut', staggerChildren: 0.1 } }, exit: { opacity: 0, transition: { duration: 0.3, ease: 'easeOut' } } };
     const backgroundStyle = theme === 'dark'
-        ? { background: 'radial-gradient(circle at top center, #4c1d95 0%, #1e1b4b 100%)' } // Dark Purple gradient
+        ? { background: 'radial-gradient(circle at top center, #4B1C93 0%, #1e1b4b 100%)' } // Dark Purple gradient
         : { background: 'radial-gradient(circle at top center, #f3e8ff 0%, #e9d5ff 100%)' }; // Light Purple gradient
 
     // Options for Ringkasan Chart Metric Selector
@@ -778,7 +778,7 @@ const PendidikanMadrasah = () => {
                                     <motion.div variants={itemVariant} className={`rounded-xl backdrop-blur-md border shadow-lg overflow-hidden ${theme === 'dark' ? 'bg-gray-800/50 border-purple-700/40' : 'bg-white/60 border-purple-200/60'}`}>
                                         <div className="p-4 sm:p-5">
                                             <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-purple-200' : 'text-purple-900'}`}>Perbandingan {selectedMetricName} per Kecamatan</h3>
-                                            <div className="h-96"> {/* Increased height */}
+                                            <div className="h-96 min-w-0"> {/* Increased height */}
                                                 <ResponsiveContainer width="100%" height="100%">
                                                     <BarChart data={ringkasanChartData} margin={{ top: 5, right: 5, left: -15, bottom: 65 }}> {/* Adjusted bottom margin */}
                                                         <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? 'rgba(109, 40, 217, 0.2)' : 'rgba(233, 213, 255, 0.5)'} />
