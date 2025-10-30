@@ -512,7 +512,7 @@ const DataKeagamaanPage = () => {
             <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm shadow-sm border-b border-gray-200">
                 <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
                     <h1 className="text-2xl font-bold text-gray-800">
-                        Admin: Data Keagamaan
+                        Data Keagamaan
                     </h1>
                     <div className="flex items-center gap-4">
                         {showSuccess && (

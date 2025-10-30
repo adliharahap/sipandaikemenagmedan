@@ -343,10 +343,10 @@ const SertifikasiHalalPage = () => {
       {/* Header Utama Halaman */}
       <div className="bg-white shadow-sm border-b border-gray-200 p-4">
         <h1 className="text-3xl font-bold text-gray-800">
-          Admin: Data Sertifikasi Halal
+          Data Sertifikasi Halal
         </h1>
         <p className="text-gray-600">
-          Kelola data sertifikasi halal. Setiap bagian disimpan secara terpisah.
+          Data sertifikasi halal meliputi total pendaftaran, penerbitan, dan demografi produk.
         </p>
       </div>
 

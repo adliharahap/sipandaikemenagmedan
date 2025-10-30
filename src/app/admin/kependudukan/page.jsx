@@ -244,7 +244,7 @@ const DashboardKependudukan = () => {
       {/* Konten Utama Halaman */}
       <div className="p-4 sm:p-6 md:p-8 bg-gray-50 min-h-screen">
         <h1 className="text-3xl font-bold mb-6 text-gray-800">
-          Admin Dashboard: Data Kependudukan
+          Data Kependudukan
         </h1>
 
         {/* Kontainer tabel agar responsif */}

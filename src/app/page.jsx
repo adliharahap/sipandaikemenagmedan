@@ -7,7 +7,6 @@ import dynamic from 'next/dynamic'; // --- PERUBAHAN LAZY LOADING ---
 
 import WaveBackground from '../../components/SvgComponent/WaveBackground';
 import Navbar from '../../components/Navbar';
-import AsnDanNonASN from './Screen/AsnDanNonASN';
 
 // --- Komponen Loading Sederhana ---
 // Ini akan ditampilkan sementara komponen lain sedang dimuat
@@ -27,7 +26,8 @@ const DataKeagamaan = dynamic(() => import('./Screen/DataKeagamaan'), { suspense
 const PendidikanMadrasah = dynamic(() => import('./Screen/PendidikanMadrasah'), { suspense: true });
 const SertifikasiHalal = dynamic(() => import('./Screen/SertifikasiHalal'), { suspense: true });
 const HajiUmrah = dynamic(() => import('./Screen/HajiUmrah'), { suspense: true });
-const AparaturDanAset = dynamic(() => import('./Screen/AsnDanNonASN'), { suspense: true });
+const Kepegawaian = dynamic(() => import('./Screen/Kepegawaian'), { suspense: true });
+const Footer = dynamic(() => import('../../components/Footer'), { suspense: true });
 
 
 // --- IKON SVG UNTUK STATISTIK (Tidak diubah) ---
@@ -162,8 +162,8 @@ const Home = () => {
         </motion.div>
         {/* Latar Belakang Ombak */}
         <motion.div
-          className="absolute bottom-0 left-0 z-20 w-full" 
-          style={{ transform: 'translateY(5px)' }}
+          className="absolute bottom-[-1px] left-0 z-20 w-full" 
+          // style={{ transform: 'translateY(5px)' }}
           variants={waveVariants}
           initial="hidden"
           whileInView="visible"
@@ -181,7 +181,8 @@ const Home = () => {
         <PendidikanMadrasah />
         <SertifikasiHalal />
         <HajiUmrah />
-        <AsnDanNonASN />
+        <Kepegawaian />
+        <Footer />
       </Suspense>
     </>
   );

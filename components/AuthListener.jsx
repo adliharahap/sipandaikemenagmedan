@@ -1,22 +1,26 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { setUser, clearUser } from "../store/authSlice";
 import { onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { auth, db } from "../utils/firebase";
-import { collection, doc, getCountFromServer, getDoc, getDocs, query, serverTimestamp, setDoc, where, writeBatch } from "firebase/firestore";
-
-
+import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
+import { fetchLandingPageData } from "../store/dataSlice";
+import MemuatData from "./MemuatData";
 
 export default function AuthListener({ children }) {
   const dispatch = useDispatch();
   const router = useRouter();
-  const [checkingAuth, setCheckingAuth] = useState(true);
 
-  // disini nanti tempat ambil semua data pertama kali 
+  const landingStatus = useSelector((state) => state.landingData.status);
 
+  useEffect(() => {
+    if (landingStatus === 'idle') {
+      dispatch(fetchLandingPageData());
+    }
+  }, [dispatch, landingStatus]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -28,7 +32,6 @@ export default function AuthListener({ children }) {
           let isNewUser = false;
 
           if (!docSnap.exists()) {
-            // 🆕 User baru → simpan ke Firestore
             isNewUser = true;
             userData = {
               uid: currentUser.uid,
@@ -37,13 +40,12 @@ export default function AuthListener({ children }) {
               photoURL:
                 currentUser.photoURL ||
                 `https://placehold.co/150x150/22c55e/FFFFFF?text=${encodeURIComponent(
-                  currentUser.displayName || "Kemenag"
+                  currentUser.displayName || "User"
                 )}`,
               role: "user",
               status: "not verified",
               registeredAt: serverTimestamp(),
             };
-
             await setDoc(userRef, userData);
           } else {
             userData = docSnap.data();
@@ -58,27 +60,27 @@ export default function AuthListener({ children }) {
 
           dispatch(setUser(serializableUserData));
 
-          // ⚙️ Langsung redirect jika belum verified ATAU user baru
           if (isNewUser || userData.status !== "verified") {
             router.replace("/");
             return;
           }
-
         } else {
           dispatch(clearUser());
-          // router.replace("/login");
           return;
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
-      } finally {
-        // Selesai cek auth
-        setCheckingAuth(false);
       }
     });
 
     return () => unsubscribe();
   }, [dispatch, router]);
+
+  if (landingStatus === "loading" || landingStatus === "idle") {
+    return (
+      <MemuatData />
+    );
+  }
 
   return children;
 }

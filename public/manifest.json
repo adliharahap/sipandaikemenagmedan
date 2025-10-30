@@ -1,0 +1,30 @@
+{
+  "name": "SIPANDAI (Sistem Penyajian Data Keagamaan Interaktif)",
+  "short_name": "SIPANDAI",
+  "description": "SIPANDAI adalah dashboard digital Kemenag Kota Medan untuk data keagamaan yang akurat dan interaktif. Akses info demografi, tren, dan layanan dengan cepat untuk mendukung transparansi publik dan pengambilan kebijakan.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#FFFFFF",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/logo3.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/logo3.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/logo3.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

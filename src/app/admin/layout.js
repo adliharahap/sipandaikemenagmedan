@@ -28,14 +28,14 @@ const SettingsIcon = ({ className }) => (
 
 // --- Array Navigasi yang Telah Diperbarui ---
 const navigation = [
-  { name: 'Dashboard', href: '/admin', icon: HomeIcon, },
   { name: 'User', href: '/admin/user', icon: UserIcon, },
   { name: 'Kependudukan', href: '/admin/kependudukan', icon: ClipboardListIcon, },
   { name: 'Data Keagamaan', href: '/admin/data-keagamaan', icon: LayoutIcon, },
   { name: 'Pendidikan Madrasah', href: '/admin/madrasah', icon: LayoutIcon, },
   { name: 'Sertifikasi Halal', href: '/admin/sertifikasi-halal', icon: LayoutIcon, },
   { name: 'Haji & Umrah', href: '/admin/haji-umrah', icon: LayoutIcon, },
-  { name: 'ASN & Non ASN', href: '/admin/asn-non-asn', icon: LayoutIcon, },
+  { name: 'Kepegawaian', href: '/admin/kepegawaian', icon: LayoutIcon, },
+  { name: 'Back To Home', href: '/', icon: HomeIcon, },
 ];
 
 

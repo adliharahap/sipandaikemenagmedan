@@ -1,6 +1,6 @@
 "use client";
 import { useTheme } from "next-themes";
-import { motion, useInView, animate } from "framer-motion";
+import { motion, useInView, animate, AnimatePresence } from "framer-motion";
 import React, { useEffect, useRef, useState } from "react";
 import {
   ResponsiveContainer,
@@ -15,6 +15,8 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
+// Import useSelector untuk mengambil data dari Redux
+import { useSelector } from "react-redux";
 
 // --- 1. Ikon SVG Kustom ---
 const TotalPopIcon = (props) => (
@@ -37,7 +39,6 @@ const DownloadIcon = (props) => (
     <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
   </svg>
 );
-// --- AWAL PENAMBAHAN IKON ---
 const AreaIcon = (props) => (
   <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" d="M9 20l-5.447-2.724A2.25 2.25 0 012.25 15.056V8.625a2.25 2.25 0 011.056-1.948L7.5 4.22m0 0l2.25 1.125m0 0l2.25 1.125m0 0l2.25 1.125m2.25-1.125L12 5.345m0 0L9.75 6.47m2.25-1.125L12 2.25L9 3.75m3 1.586L12 6.47l-2.25-1.125m6.75 0L15 6.47l2.25-1.125m0 0L21 3.75l-2.25 1.125M15 6.47L12 7.6m3-1.125L12 5.345m0 0l2.25 1.125M15 6.47l2.25 1.125m0 0l2.25 1.125m0 0v6.431a2.25 2.25 0 01-1.303 2.052L15 20M9 20l6-3m-6 3v-6.431a2.25 2.25 0 011.303-2.052L15 8.793M9 20l-3.303-1.652A2.25 2.25 0 014.5 16.297V8.625M9 20l2.25-1.125M15 8.793l2.25 1.125m-2.25-1.125L12 7.6m0 0L9.75 8.793m2.25-1.125L12 5.345M9.75 8.793L7.5 9.919m2.25-1.126L7.5 7.6M12 7.6L9 9.135m3-1.53L9.75 4.95m2.25 2.65L12 5.345" />
@@ -54,58 +55,12 @@ const DensityIcon = (props) => (
     <path strokeLinecap="round" strokeLinejoin="round" d="M12 14.25A5.25 5.25 0 1012 3.75a5.25 5.25 0 000 10.5zM12 14.25a.75.75 0 010 1.5.75.75 0 010-1.5z" />
   </svg>
 );
-// --- AKHIR PENAMBAHAN IKON ---
 
-// --- 2. Mock Data Kependudukan ---
-// --- AWAL PERUBAHAN DATA: Menambahkan luas_wilayah, kelurahan, dan kepadatan ---
-const dataKependudukan = [
-  { kode: "12.71.01", kecamatan: "Medan Kota", laki_laki: 42100, perempuan: 41500, total: 83600, kelurahan: 12, luas_wilayah: 5.27, kepadatan: 83600 / 5.27 },
-  { kode: "12.71.02", kecamatan: "Medan Sunggal", laki_laki: 105000, perempuan: 103000, total: 208000, kelurahan: 6, luas_wilayah: 15.44, kepadatan: 208000 / 15.44 },
-  { kode: "12.71.03", kecamatan: "Medan Helvetia", laki_laki: 75000, perempuan: 74000, total: 149000, kelurahan: 7, luas_wilayah: 13.16, kepadatan: 149000 / 13.16 },
-  { kode: "12.71.04", kecamatan: "Medan Denai", laki_laki: 80000, perempuan: 79000, total: 159000, kelurahan: 6, luas_wilayah: 9.05, kepadatan: 159000 / 9.05 },
-  { kode: "12.71.05", kecamatan: "Medan Barat", laki_laki: 48000, perempuan: 47000, total: 95000, kelurahan: 6, luas_wilayah: 5.33, kepadatan: 95000 / 5.33 },
-  { kode: "12.71.06", kecamatan: "Medan Deli", laki_laki: 90000, perempuan: 88000, total: 178000, kelurahan: 6, luas_wilayah: 20.84, kepadatan: 178000 / 20.84 },
-  { kode: "12.71.07", kecamatan: "Medan Tuntungan", laki_laki: 46000, perempuan: 45000, total: 91000, kelurahan: 9, luas_wilayah: 20.68, kepadatan: 91000 / 20.68 },
-  { kode: "12.71.08", kecamatan: "Medan Belawan", laki_laki: 55000, perempuan: 54000, total: 109000, kelurahan: 6, luas_wilayah: 21.82, kepadatan: 109000 / 21.82 },
-  { kode: "12.71.09", kecamatan: "Medan Amplas", laki_laki: 70000, perempuan: 69000, total: 139000, kelurahan: 7, luas_wilayah: 11.19, kepadatan: 139000 / 11.19 },
-  { kode: "12.71.10", kecamatan: "Medan Area", laki_laki: 60000, perempuan: 59000, total: 119000, kelurahan: 12, luas_wilayah: 5.52, kepadatan: 119000 / 5.52 },
-  { kode: "12.71.11", kecamatan: "Medan Johor", laki_laki: 78000, perempuan: 77000, total: 155000, kelurahan: 6, luas_wilayah: 14.58, kepadatan: 155000 / 14.58 },
-  { kode: "12.71.12", kecamatan: "Medan Marelan", laki_laki: 85000, perempuan: 83000, total: 168000, kelurahan: 5, luas_wilayah: 23.82, kepadatan: 168000 / 23.82 },
-  { kode: "12.71.13", kecamatan: "Medan Labuhan", laki_laki: 68000, perempuan: 67000, total: 135000, kelurahan: 6, luas_wilayah: 36.67, kepadatan: 135000 / 36.67 },
-  { kode: "12.71.14", kecamatan: "Medan Tembung", laki_laki: 72000, perempuan: 71000, total: 143000, kelurahan: 7, luas_wilayah: 7.99, kepadatan: 143000 / 7.99 },
-  { kode: "12.71.15", kecamatan: "Medan Maimun", laki_laki: 25000, perempuan: 24000, total: 49000, kelurahan: 6, luas_wilayah: 2.98, kepadatan: 49000 / 2.98 },
-  { kode: "12.71.16", kecamatan: "Medan Polonia", laki_laki: 30000, perempuan: 29000, total: 59000, kelurahan: 5, luas_wilayah: 9.01, kepadatan: 59000 / 9.01 },
-  { kode: "12.71.17", kecamatan: "Medan Baru", laki_laki: 22000, perempuan: 21000, total: 43000, kelurahan: 6, luas_wilayah: 5.84, kepadatan: 43000 / 5.84 },
-  { kode: "12.71.18", kecamatan: "Medan Perjuangan", laki_laki: 50000, perempuan: 49000, total: 99000, kelurahan: 9, luas_wilayah: 4.09, kepadatan: 99000 / 4.09 },
-  { kode: "12.71.19", kecamatan: "Medan Petisah", laki_laki: 35000, perempuan: 34000, total: 69000, kelurahan: 7, luas_wilayah: 6.82, kepadatan: 69000 / 6.82 },
-  { kode: "12.71.20", kecamatan: "Medan Timur", laki_laki: 58000, perempuan: 57000, total: 115000, kelurahan: 11, luas_wilayah: 7.76, kepadatan: 115000 / 7.76 },
-  { kode: "12.71.21", kecamatan: "Medan Selayang", laki_laki: 51000, perempuan: 50000, total: 101000, kelurahan: 6, luas_wilayah: 12.81, kepadatan: 101000 / 12.81 },
-];
-// --- AKHIR PERUBAHAN DATA ---
+// --- 2. Mock Data Kependudukan (DIHAPUS) ---
+// Data statis dihapus, akan diganti dari Redux
 
-// --- 3. Komponen Kalkulasi & Data ---
-// Menghitung total untuk KPI Cards dan Pie Chart
-const totalLakiLaki = dataKependudukan.reduce((acc, curr) => acc + curr.laki_laki, 0);
-const totalPerempuan = dataKependudukan.reduce((acc, curr) => acc + curr.perempuan, 0);
-const totalPenduduk = totalLakiLaki + totalPerempuan;
-
-// --- AWAL PENAMBAHAN KALKULASI ---
-const totalLuasWilayah = dataKependudukan.reduce((acc, curr) => acc + curr.luas_wilayah, 0);
-const totalKelurahan = dataKependudukan.reduce((acc, curr) => acc + curr.kelurahan, 0);
-const rataRataKepadatan = totalPenduduk / totalLuasWilayah;
-// --- AKHIR PENAMBAHAN KALKULASI ---
-
-const dataGender = [
-  { name: "Laki-laki", value: totalLakiLaki, color: "#60A5FA" },
-  { name: "Perempuan", value: totalPerempuan, color: "#F87171" },
-];
-const GENDER_COLORS = dataGender.map(d => d.color);
-const KECAMATAN_COLOR = "#34D399"; // Warna hijau untuk bar kecamatan
-// --- AWAL PENAMBAHAN WARNA ---
-const LUAS_COLOR = "#F59E0B"; // Oranye
-const KEPADATAN_COLOR = "#EF4444"; // Merah
-const KELURAHAN_COLOR = "#A78BFA"; // Ungu
-// --- AKHIR PENAMBAHAN WARNA ---
+// --- 3. Komponen Kalkulasi & Data (PINDAH KE DALAM KOMPONEN) ---
+// const totalLakiLaki = ... (dipindah)
 
 // --- 4. Komponen Angka Animasi ---
 const AnimatedNumber = ({ value, isDecimal = false }) => {
@@ -136,7 +91,6 @@ const AnimatedNumber = ({ value, isDecimal = false }) => {
 
 
 // --- 5. Komponen Tooltip Kustom ---
-// --- AWAL PERUBAHAN: Tooltip dibuat lebih fleksibel dengan `dataType` ---
 const CustomTooltip = ({ active, payload, label, theme, chartType, dataType = 'populasi' }) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
@@ -177,6 +131,9 @@ const CustomTooltip = ({ active, payload, label, theme, chartType, dataType = 'p
       
       // Tooltip untuk data Wilayah
       if (dataType === 'wilayah') {
+        // Ambil warna dari konstanta yang didefinisikan di dalam komponen utama
+        const LUAS_COLOR = "#F59E0B"; 
+        const KEPADATAN_COLOR = "#EF4444";
         return (
           <div className={`rounded-lg p-3 shadow-lg ${theme === 'dark' ? 'bg-[#2E1A47] border border-gray-700' : 'bg-white border border-gray-200'}`}>
             <p className={`font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{label}</p>
@@ -193,10 +150,8 @@ const CustomTooltip = ({ active, payload, label, theme, chartType, dataType = 'p
   }
   return null;
 };
-// --- AKHIR PERUBAHAN: Tooltip ---
 
 // --- 6. Komponen Kartu KPI ---
-// --- AWAL PERUBAHAN: Menambahkan prop `suffix` dan `isDecimal` ---
 const KpiCard = ({ icon, title, value, color, theme, suffix = "", isDecimal = false }) => {
   const cardVariant = {
     hidden: { opacity: 0, y: 30 },
@@ -230,27 +185,74 @@ const KpiCard = ({ icon, title, value, color, theme, suffix = "", isDecimal = fa
     </motion.div>
   );
 };
-// --- AKHIR PERUBAHAN: Komponen KPI ---
 
 
 // --- 7. Komponen Utama Kependudukan ---
 const Kependudukan = () => {
   const { theme } = useTheme();
+
+  // --- PERUBAHAN 1: Ambil data dari Redux Store ---
+  const { data, status } = useSelector((state) => state.landingData);
+  
   const [chartType, setChartType] = useState('bar'); // 'bar' atau 'pie'
-  // --- AWAL PENAMBAHAN STATE ---
   const [areaChartType, setAreaChartType] = useState('luas'); // 'luas' atau 'kepadatan'
-  // --- AKHIR PENAMBAHAN STATE ---
+  
+  // --- PERUBAHAN 2: Loading dan Error State ---
+  const backgroundStyle = theme === "dark" ? "bg-[#210F37]" : "bg-[#E4EFE7]";
+  if (status === 'loading' || status === 'idle') {
+    return (
+      <div className={`w-full min-h-screen flex items-center justify-center p-4 text-center ${backgroundStyle}`}>
+        <p className={`text-lg ${theme === 'dark' ? 'text-purple-300' : 'text-gray-700'}`}>
+          Memuat Data Kependudukan...
+        </p>
+      </div>
+    );
+  }
+
+  if (status === 'failed' || !data || !data.kependudukan || !data.kependudukan.data) {
+    return (
+      <div className={`w-full min-h-screen flex items-center justify-center p-4 text-center ${backgroundStyle}`}>
+        <p className={`text-lg ${theme === 'dark' ? 'text-red-400' : 'text-red-600'}`}>
+          Gagal memuat Data Kependudukan. Silakan coba muat ulang halaman.
+        </p>
+      </div>
+    );
+  }
+
+  // --- PERUBAHAN 3: Definisikan data DARI REDUX dan lakukan kalkulasi ---
+  const dataKependudukan = data.kependudukan.data.map(item => ({
+    ...item,
+    // Pastikan kalkulasi menangani nilai null/undefined
+    total: (item.laki_laki || 0) + (item.perempuan || 0),
+    kepadatan: item.luas_wilayah ? ((item.laki_laki || 0) + (item.perempuan || 0)) / item.luas_wilayah : 0
+  }));
+
+  // --- PERUBAHAN 4: Kalkulasi total (dari data yang sudah diproses) ---
+  const totalLakiLaki = dataKependudukan.reduce((acc, curr) => acc + curr.laki_laki, 0);
+  const totalPerempuan = dataKependudukan.reduce((acc, curr) => acc + curr.perempuan, 0);
+  const totalPenduduk = totalLakiLaki + totalPerempuan;
+  const totalLuasWilayah = dataKependudukan.reduce((acc, curr) => acc + curr.luas_wilayah, 0);
+  const totalKelurahan = dataKependudukan.reduce((acc, curr) => acc + curr.kelurahan, 0);
+  const rataRataKepadatan = totalPenduduk / totalLuasWilayah;
+
+  const dataGender = [
+    { name: "Laki-laki", value: totalLakiLaki, color: "#60A5FA" },
+    { name: "Perempuan", value: totalPerempuan, color: "#F87171" },
+  ];
+  const GENDER_COLORS = dataGender.map(d => d.color);
+  const KECAMATAN_COLOR = "#34D399"; // Warna hijau untuk bar kecamatan
+  const LUAS_COLOR = "#F59E0B"; // Oranye
+  const KEPADATAN_COLOR = "#EF4444"; // Merah
+  const KELURAHAN_COLOR = "#A78BFA"; // Ungu
 
   // Fungsi Download CSV
   const handleDownloadCSV = () => {
-    // --- AWAL PERUBAHAN: Menambahkan data baru ke CSV ---
     let csvContent = "data:text/csv;charset=utf-8,Kode,Kecamatan,Laki_Laki,Perempuan,Total,Kelurahan,Luas_Wilayah_km2,Kepadatan_jiwa_per_km2\n";
     dataKependudukan.forEach(row => {
       csvContent += `${row.kode},${row.kecamatan},${row.laki_laki},${row.perempuan},${row.total},${row.kelurahan},${row.luas_wilayah.toFixed(2)},${Math.round(row.kepadatan)}\n`;
     });
     // Tambahkan baris total
     csvContent += `\nTotal,,${totalLakiLaki},${totalPerempuan},${totalPenduduk},${totalKelurahan},${totalLuasWilayah.toFixed(2)},\n`;
-    // --- AKHIR PERUBAHAN: CSV ---
 
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
@@ -414,9 +416,7 @@ const Kependudukan = () => {
                         interval={0}
                       />
                       <YAxis tickFormatter={(value) => new Intl.NumberFormat('id-ID', { notation: 'compact' }).format(value)} tick={{ fill: textLabelColor, fontSize: 12 }} />
-                      {/* --- AWAL PERUBAHAN: Menambahkan dataType ke Tooltip --- */}
                       <Tooltip content={<CustomTooltip theme={theme} chartType="bar" dataType="populasi" />} />
-                      {/* --- AKHIR PERUBAHAN --- */}
                       <Legend 
                         verticalAlign="top" 
                         formatter={(value) => <span className={theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}>{value === 'laki_laki' ? 'Laki-laki' : 'Perempuan'}</span>} 
@@ -479,7 +479,7 @@ const Kependudukan = () => {
           </div> {/* End Layout Wrapper */}
         </motion.div>
         
-        {/* --- AWAL BAGIAN BARU: LUAS WILAYAH & KEPADATAN --- */}
+        {/* --- BAGIAN BARU: LUAS WILAYAH & KEPADATAN --- */}
         <motion.div 
           className={`rounded-2xl shadow-xl p-4 sm:p-8 mt-12 ${theme === 'dark' ? 'bg-[#2E1A47]' : 'bg-white'}`}
           variants={itemVariant}
@@ -525,6 +525,7 @@ const Kependudukan = () => {
               color={KEPADATAN_COLOR}
               theme={theme}
               suffix=" jiwa/km²"
+              isDecimal={true} 
             />
           </motion.div>
 
@@ -592,4 +593,3 @@ const Kependudukan = () => {
 }
 
 export default Kependudukan;
-

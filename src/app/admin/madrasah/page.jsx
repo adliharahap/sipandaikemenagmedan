@@ -438,10 +438,10 @@ const PendidikanMadrasahPage = () => {
       {/* Header Utama Halaman */}
       <div className="bg-white shadow-sm border-b border-gray-200 p-4">
         <h1 className="text-3xl font-bold text-gray-800">
-          Admin: Data Pendidikan Madrasah
+          Data Pendidikan Madrasah
         </h1>
         <p className="text-gray-600">
-          Kelola data per tabel. Setiap tabel disimpan secara terpisah di database.
+          Halaman ini menampilkan data pendidikan madrasah di Kota Medan, termasuk jumlah RA, MIN, MIS, MTsN, MTsS
         </p>
       </div>
 

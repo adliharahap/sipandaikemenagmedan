@@ -1,6 +1,7 @@
 // store.js (SESUDAH)
 import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import authReducer from './authSlice';
+import dataReducer from './dataSlice';
 
 // 1. Import kebutuhan dari redux-persist
 import {
@@ -25,7 +26,7 @@ const persistConfig = {
 // Gabungkan semua reducer Anda
 const rootReducer = combineReducers({
   auth: authReducer,
-
+  landingData: dataReducer,
 });
 
 // 3. Buat reducer yang sudah di-"persist"

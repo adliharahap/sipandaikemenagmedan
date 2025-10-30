@@ -298,7 +298,7 @@ const SimpleObjectEditor = ({ title, docPath, initialData }) => {
 
 
 // --- HALAMAN UTAMA ---
-const ASNdanNonASNPage = () => {
+const KepegawaianPage = () => {
 
   // --- Data dari Teks Anda ---
   const dataSatuanKerja = [
@@ -435,10 +435,10 @@ const ASNdanNonASNPage = () => {
       {/* Header Utama Halaman */}
       <div className="bg-white shadow-sm border-b border-gray-200 p-4">
         <h1 className="text-3xl font-bold text-gray-800">
-          Admin: Data Kepegawaian (ASN & Non-ASN)
+          Data Kepegawaian (ASN & Non-ASN)
         </h1>
         <p className="text-gray-600">
-          Kelola data kepegawaian. Setiap bagian disimpan secara terpisah.
+          Kelola data kepegawaian untuk PNS, PPPK, dan Non-ASN.
         </p>
       </div>
 
@@ -579,4 +579,4 @@ const ASNdanNonASNPage = () => {
   );
 };
 
-export default ASNdanNonASNPage;
+export default KepegawaianPage;

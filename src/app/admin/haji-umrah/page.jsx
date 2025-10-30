@@ -2,10 +2,10 @@
 
 import React, { useState, useEffect, Fragment } from 'react';
 import { db } from '../../../../utils/firebase';
-import { 
-  doc, 
-  onSnapshot, 
-  setDoc, 
+import {
+  doc,
+  onSnapshot,
+  setDoc,
   updateDoc,
   setLogLevel
 } from 'firebase/firestore';
@@ -20,6 +20,13 @@ const SaveIcon = (props) => (
   </svg>
 );
 
+const PlusIcon = (props) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <line x1="12" y1="5" x2="12" y2="19" />
+    <line x1="5" y1="12" x2="19" y2="12" />
+  </svg>
+);
+
 // --- Komponen UI ---
 const EditableCell = ({ value, onChange, type = 'text', readOnly = false, className = "" }) => (
   <input
@@ -27,15 +34,14 @@ const EditableCell = ({ value, onChange, type = 'text', readOnly = false, classN
     value={value}
     onChange={onChange}
     readOnly={readOnly}
-    className={`w-full p-2 border rounded-md transition-all text-black ${
-      readOnly ? 'bg-gray-100 text-gray-700 border-gray-200' : 'bg-transparent border-gray-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500'
-    } ${className}`}
+    className={`w-full p-2 border rounded-md transition-all text-black ${readOnly ? 'bg-gray-100 text-gray-700 border-gray-200' : 'bg-transparent border-gray-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500'
+      } ${className}`}
     step={type === 'number' ? '1' : undefined}
   />
 );
 
 // --- Editor Komponen 1: Untuk Tabel Array Sederhana (cth: dataKuota) ---
-const ArrayDataTableEditor = ({ title, docPath, initialData, columns }) => {
+const ArrayDataTableEditor = ({ title, docPath, initialData, columns, onAddNewRow }) => {
   const [docRef, setDocRef] = useState(null);
   const [currentData, setCurrentData] = useState([]);
   const [originalData, setOriginalData] = useState([]);
@@ -47,8 +53,8 @@ const ArrayDataTableEditor = ({ title, docPath, initialData, columns }) => {
   useEffect(() => {
     setIsLoading(true);
     setLogLevel('Debug');
-    
-    const ref = doc(db, docPath); 
+
+    const ref = doc(db, docPath);
     setDocRef(ref);
 
     const unsubscribe = onSnapshot(ref, async (docSnap) => {
@@ -64,7 +70,7 @@ const ArrayDataTableEditor = ({ title, docPath, initialData, columns }) => {
           console.error(`Error seeding data to ${ref.path}:`, error);
         }
       }
-      
+
       if (data) {
         setCurrentData(data);
         setOriginalData(data);
@@ -91,7 +97,7 @@ const ArrayDataTableEditor = ({ title, docPath, initialData, columns }) => {
     try {
       await updateDoc(docRef, { data: currentData });
       setShowSuccess(true);
-      setOriginalData(currentData); 
+      setOriginalData(currentData);
       setTimeout(() => setShowSuccess(false), 2000);
     } catch (error) {
       console.error(`Error saving changes to ${docRef.path}:`, error);
@@ -119,6 +125,15 @@ const ArrayDataTableEditor = ({ title, docPath, initialData, columns }) => {
         <h2 className="text-xl font-semibold text-gray-800">{title}</h2>
         <div className="flex items-center gap-4">
           {showSuccess && <span className="text-green-600 font-medium">Tersimpan!</span>}
+          {onAddNewRow && (
+            <button
+              onClick={() => onAddNewRow(currentData, setCurrentData)}
+              className="flex items-center px-3 py-1.5 bg-green-600 text-white font-semibold rounded-md shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition-all text-sm"
+            >
+              <PlusIcon className="w-4 h-4 mr-2" />
+              Tambah Baris
+            </button>
+          )}
           <button
             onClick={handleSaveChanges}
             disabled={!hasChanged}
@@ -129,7 +144,7 @@ const ArrayDataTableEditor = ({ title, docPath, initialData, columns }) => {
           </button>
         </div>
       </div>
-      
+
       {isLoading ? (
         <div className="p-4 text-center text-gray-500">Loading data...</div>
       ) : (
@@ -182,7 +197,7 @@ const ComplexHajiDataEditor = ({ title, docPath, initialData, columns }) => {
   useEffect(() => {
     setIsLoading(true);
     setLogLevel('Debug');
-    
+
     const ref = doc(db, docPath);
     setDocRef(ref);
 
@@ -199,7 +214,7 @@ const ComplexHajiDataEditor = ({ title, docPath, initialData, columns }) => {
           console.error(`Error seeding data to ${ref.path}:`, error);
         }
       }
-      
+
       if (data) {
         setCurrentData(data);
         setOriginalData(data);
@@ -232,7 +247,7 @@ const ComplexHajiDataEditor = ({ title, docPath, initialData, columns }) => {
       console.error(`Error saving changes to ${docRef.path}:`, error);
     }
   };
-  
+
   // --- Handlers untuk data kompleks ---
   const handleSimpleChange = (field, value) => {
     setCurrentData(prev => ({
@@ -291,7 +306,7 @@ const ComplexHajiDataEditor = ({ title, docPath, initialData, columns }) => {
           </button>
         </div>
       </div>
-      
+
       <div className="p-4 space-y-6">
         {/* Bagian Total, LK, PR */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -320,7 +335,7 @@ const ComplexHajiDataEditor = ({ title, docPath, initialData, columns }) => {
             <EditableCell value={currentData.pengalaman.belum} onChange={(e) => handleExperienceChange('belum', e.target.value)} type="number" />
           </div>
         </div>
-        
+
         {/* Bagian Tabel-tabel */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <SubTableEditor title="Pendidikan" data={currentData.pendidikan} columns={columns.pendidikan} onChange={(...args) => handleTableChange('pendidikan', ...args)} />
@@ -382,7 +397,7 @@ const SimpleObjectEditor = ({ title, docPath, initialData }) => {
   useEffect(() => {
     setIsLoading(true);
     setLogLevel('Debug');
-    
+
     const ref = doc(db, docPath);
     setDocRef(ref);
 
@@ -399,7 +414,7 @@ const SimpleObjectEditor = ({ title, docPath, initialData }) => {
           console.error(`Error seeding data to ${ref.path}:`, error);
         }
       }
-      
+
       if (data) {
         setCurrentData(data);
         setOriginalData(data);
@@ -437,7 +452,7 @@ const SimpleObjectEditor = ({ title, docPath, initialData }) => {
       [key]: parseInt(value, 10) || 0
     }));
   };
-  
+
   // Fungsi untuk mengubah key (misal "pasporHaji") menjadi label ("Paspor Haji")
   const formatLabel = (key) => {
     const spaced = key.replace(/([A-Z])/g, ' $1');
@@ -468,7 +483,7 @@ const SimpleObjectEditor = ({ title, docPath, initialData }) => {
           </button>
         </div>
       </div>
-      
+
       <div className="p-4 grid grid-cols-1 md:grid-cols-3 gap-4">
         {Object.keys(currentData).map((key) => (
           <div key={key}>
@@ -501,7 +516,7 @@ const HajiUmrahPage = () => {
   const pendidikanColumns = [{ header: 'Pendidikan', key: 'name' }, { header: 'Jumlah', key: 'value', align: 'right' }];
   const usiaColumns = [{ header: 'Rentang Usia', key: 'name' }, { header: 'Jumlah', key: 'value', align: 'right' }];
   const pekerjaanColumns = [{ header: 'Pekerjaan', key: 'name' }, { header: 'Jumlah', key: 'value', align: 'right' }];
-  
+
   // Gabungkan kolom untuk data kompleks
   const complexHajiColumns = {
     pendidikan: pendidikanColumns,
@@ -509,50 +524,73 @@ const HajiUmrahPage = () => {
     pekerjaan: pekerjaanColumns
   };
 
+  const addKuotaTahunRow = (currentData, setCurrentData) => {
+    let maxTahun = new Date().getFullYear(); // Default jika data kosong
+
+    if (currentData.length > 0) {
+      // Cari tahun terbesar dari data yang ada
+      maxTahun = Math.max(...currentData.map(row => row.tahun));
+    }
+
+    const newRow = {
+      tahun: maxTahun + 1,
+      kuota: 0
+    };
+
+    // Cek agar tidak ada duplikat tahun (jika tombol diklik berkali-kali)
+    if (currentData.some(row => row.tahun === newRow.tahun)) {
+      console.warn(`Tahun ${newRow.tahun} sudah ada.`);
+      return;
+    }
+
+    setCurrentData([...currentData, newRow]);
+  };
+
   return (
     <Fragment>
       {/* Header Utama Halaman */}
       <div className="bg-white shadow-sm border-b border-gray-200 p-4">
         <h1 className="text-3xl font-bold text-gray-800">
-          Admin: Data Haji & Umrah
+          Data Haji & Umrah
         </h1>
         <p className="text-gray-600">
-          Kelola data per bagian. Setiap bagian disimpan secara terpisah di database.
+          Halaman ini berisi data terkait haji dan umrah, termasuk kuota, pendaftar, dan demografi.
         </p>
       </div>
 
       {/* Konten Utama Halaman */}
       <div className="p-4 sm:p-6 md:p-8 bg-gray-50 min-h-screen">
         <div className="max-w-screen-xl mx-auto flex flex-col gap-6">
-          
+
           <ArrayDataTableEditor
             title="Data Kuota Haji"
             docPath="haji/kuota"
             initialData={dataKuota}
             columns={kuotaColumns}
+            onAddNewRow={addKuotaTahunRow}
           />
-          
+
           <ComplexHajiDataEditor
             title="Data Jemaah Haji Tunggu"
             docPath="haji/dataTunggu"
             initialData={dataTunggu}
             columns={complexHajiColumns}
           />
-          
+
           <ComplexHajiDataEditor
             title="Data Jemaah Haji Berangkat"
             docPath="haji/dataHajiBerangkat"
             initialData={dataHajiBerangkat}
             columns={complexHajiColumns}
           />
-          
+
           <ComplexHajiDataEditor
             title="Data Pendaftar Haji Baru"
             docPath="haji/dataPendaftarBaru"
             initialData={dataPendaftarBaru}
             columns={complexHajiColumns}
           />
-          
+
           <SimpleObjectEditor
             title="Data Lain-lain"
             docPath="haji/dataLain"

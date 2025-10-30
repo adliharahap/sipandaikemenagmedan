@@ -98,7 +98,7 @@ const Navbar = () => {
         { name: 'Haji & Umrah', href: '#haji-umrah' },
       ]
     },
-    { name: 'ASN & Non ASN', href: '#asn' },
+    { name: 'Kepegawaian', href: '#kepegawaian' },
   ];
 
   // Varian animasi (Tidak Berubah)
@@ -305,7 +305,7 @@ const Navbar = () => {
                                 ) && (
                                     <div className="p-1 mt-1">
                                       <Link
-                                        href="/admin"
+                                        href="/admin/user"
                                         className={`w-full flex items-center gap-3 px-3 py-2 text-sm rounded-md ${isSticky ? 'text-[#064420]' : 'text-[#E4EFE7]'
                                           } dark:text-[#E4EFE7] hover:bg-[#FAF1E6]/40 dark:hover:bg-[#1F2922] transition-colors`}
                                         title="Go to Dashboard"
@@ -448,13 +448,34 @@ const Navbar = () => {
                       />
                     </div>
                     <div className="text-center">
-                        <p className="font-semibold text-[#064420] dark:text-[#E4EFE7]">
-                          {user?.name}
-                        </p>
-                        <p className="text-sm text-[#5B7065] dark:text-gray-400">
-                          {user?.email}
-                        </p>
+                      <p className="font-semibold text-[#064420] dark:text-[#E4EFE7]">
+                        {user?.name}
+                      </p>
+                      <p className="text-sm text-[#5B7065] dark:text-gray-400">
+                        {user?.email}
+                      </p>
                     </div>
+                    {isLoggedIn && (
+                      <>
+                        {(
+                          (user?.role === "admin" ||
+                            user?.role === "owner" ||
+                            user?.role === "pegawai")
+                          && user?.status === "verified"
+                        ) && (
+                            <div className="p-1 mt-1">
+                              <Link
+                                href="/admin/user"
+                                className={`w-full flex items-center gap-3 px-12 py-3 text-md bg-slate-900/40 rounded-full ${isSticky ? 'text-[#064420]' : 'text-[#E4EFE7]'
+                                  } dark:text-[#E4EFE7] hover:bg-[#FAF1E6]/40 dark:hover:bg-[#1F2922] transition-colors`}
+                                title="Go to Dashboard"
+                              >
+                                <span>Go To Dashboard</span>
+                              </Link>
+                            </div>
+                          )}
+                      </>
+                    )}
 
                     {/* Logout Button */}
                     <motion.button

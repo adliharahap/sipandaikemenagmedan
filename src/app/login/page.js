@@ -1,11 +1,12 @@
 "use client"; // Diperlukan agar Firebase dan hooks Next.js/React berjalan di browser
 
 import React, { useEffect, useState } from 'react';
-import Navbar from '../../../components/Navbar';
 import { GoogleAuthProvider, onAuthStateChanged, signInWithPopup } from 'firebase/auth';
-import { auth } from '../../../utils/firebase';
+// Pastikan path ini benar sesuai struktur folder Anda
+import { auth } from '../../../utils/firebase'; 
 import { useRouter } from 'next/navigation';
-import LoadingScreen from '../LoadingPage';
+// Pastikan path ini benar
+import LoadingScreen from '../LoadingPage'; 
 
 // --- SVG Ikon untuk Google ---
 const GoogleIcon = ({ className }) => (
@@ -60,6 +61,7 @@ export default function LoginPage() {
             console.error("Gagal saat proses sign-in popup:", error);
             // Hanya tampilkan alert jika errornya bukan karena user menutup popup
             if (error.code !== 'auth/popup-closed-by-user') {
+                // Ganti alert dengan metode notifikasi yang lebih baik jika ada
                 alert("Gagal melakukan login. Pastikan popup tidak diblokir dan coba lagi.");
             }
         } finally {
@@ -68,23 +70,24 @@ export default function LoginPage() {
     };
 
     if (isCheckingAuth) {
+        // Tampilkan loading screen penuh selagi mengecek status auth
         return (
             <LoadingScreen />
         );
     }
 
     return (
-        <main className="min-h-screen w-full flex items-center justify-center bg-gray-100 text-gray-800 p-4 font-sans">
-            <Navbar />
+        // Latar belakang utama dengan dukungan dark mode
+        <main className="min-h-screen w-full flex items-center justify-center bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 p-4 font-sans transition-colors duration-300">
             {/* Bentuk Gradien Latar Belakang */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
-                <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-emerald-500/30 rounded-full filter blur-3xl animate-blob"></div>
-                <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] bg-green-400/30 rounded-full filter blur-3xl animate-blob animation-delay-4000"></div>
+                <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-emerald-500/30 dark:bg-emerald-700/30 rounded-full filter blur-3xl animate-blob"></div>
+                <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] bg-green-400/30 dark:bg-green-600/30 rounded-full filter blur-3xl animate-blob animation-delay-4000"></div>
             </div>
 
             <div className="w-full max-w-md mx-auto z-10">
-                {/* Kartu Login */}
-                <div className="bg-white/80 backdrop-blur-xl border border-gray-200 p-8 md:p-12 rounded-2xl shadow-lg text-center">
+                {/* Kartu Login dengan dukungan dark mode */}
+                <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border border-gray-200 dark:border-gray-700 p-8 md:p-12 rounded-2xl shadow-lg dark:shadow-black/50 text-center">
 
                     {/* Logo Kementerian Agama */}
                     <img
@@ -95,22 +98,33 @@ export default function LoginPage() {
                     />
 
                     <div className="mb-8">
-                        <h1 className="text-3xl font-bold text-gray-900 mb-2">Selamat Datang</h1>
-                        <p className="text-gray-600">Masuk untuk melanjutkan ke Panel Admin</p>
+                        {/* Teks header dengan dukungan dark mode */}
+                        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Selamat Datang</h1>
+                        <p className="text-gray-600 dark:text-gray-400">Masuk untuk melanjutkan ke Panel Admin</p>
                     </div>
 
-                    {/* Tombol Masuk dengan Google */}
+                    {/* Tombol Masuk dengan Google dan dukungan dark mode */}
                     <button
                         type="button"
                         onClick={loginWithGoogle}
                         disabled={isLoading}
-                        className="w-full inline-flex justify-center items-center gap-4 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg px-6 py-3 text-md font-medium text-gray-700 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-indigo-500
-    disabled:opacity-75 disabled:cursor-not-allowed"
+                        className="w-full inline-flex justify-center items-center gap-4 
+                           bg-white dark:bg-gray-700 
+                           border border-gray-300 dark:border-gray-600 
+                           hover:bg-gray-50 dark:hover:bg-gray-600 
+                           rounded-lg px-6 py-3 text-md font-medium 
+                           text-gray-700 dark:text-gray-100 
+                           transition-all duration-300 
+                           focus:outline-none focus:ring-2 focus:ring-offset-2 
+                           focus:ring-offset-white dark:focus:ring-offset-gray-800 
+                           focus:ring-indigo-500
+                           disabled:opacity-75 disabled:cursor-not-allowed"
                     >
                         {isLoading ? (
                             <>
                                 <div
-                                    className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-700"
+                                    // Spinner dengan dukungan dark mode
+                                    className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-700 dark:border-gray-100"
                                     role="status"
                                 >
                                 </div>
@@ -124,12 +138,12 @@ export default function LoginPage() {
                         )}
                     </button>
 
-                    <p className="text-center mt-10 text-gray-500 text-xs">
+                    <p className="text-center mt-10 text-gray-500 dark:text-gray-400 text-xs">
                         Dengan melanjutkan, Anda menyetujui Ketentuan Layanan dan Kebijakan Privasi kami.
                     </p>
                 </div>
 
-                <footer className="text-center mt-8 text-gray-500 text-sm">
+                <footer className="text-center mt-8 text-gray-500 dark:text-gray-400 text-sm">
                     <p>&copy; {new Date().getFullYear()} Kementerian Agama Kota Medan. All Rights Reserved.</p>
                 </footer>
             </div>

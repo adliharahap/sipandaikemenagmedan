@@ -10,6 +10,8 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
+// Import useSelector untuk mengambil data dari Redux
+import { useSelector } from "react-redux";
 
 // --- 1. Ikon SVG Kustom ---
 const CertificateIcon = (props) => (
@@ -22,53 +24,21 @@ const DownloadIcon = (props) => (
     <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
   </svg>
 );
-// --- AWAL PERUBAHAN: Ikon baru untuk filter ---
-const RegisterIcon = (props) => ( // Ikon untuk Pendaftaran
+const RegisterIcon = (props) => (
     <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
     </svg>
 );
-const PublishIcon = (props) => ( // Ikon untuk Penerbitan
+const PublishIcon = (props) => (
     <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
     </svg>
 );
-// --- AKHIR PERUBAHAN ---
 
 
-// --- 2. Data dari Teks Anda ---
-const totalPendaftaran = 123;
-const totalPenerbitan = 76;
+// --- 2. Data dari Teks Anda (DIHAPUS, DIGANTI REDUX) ---
 
-const dataPendaftaranJenisProduk = [
-  { name: "Makanan & Minuman", value: 117, color: "#10B981" },
-  { name: "RPU/RPH", value: 1, color: "#F59E0B" },
-  { name: "Jasa Logistik", value: 2, color: "#3B82F6" },
-  { name: "Lain-lain", value: 3, color: "#6B7280" },
-];
-const dataPendaftaranSkalaUsaha = [
-  { name: "Mikro", value: 112, color: "#8B5CF6" },
-  { name: "Kecil", value: 9, color: "#EC4899" },
-  { name: "Menengah", value: 0, color: "#F59E0B" },
-  { name: "Besar", value: 2, color: "#EF4444" },
-];
-const dataPenerbitanJenisProduk = [
-  { name: "Makanan & Minuman", value: 62, color: "#10B981" },
-  { name: "RPU/RPH", value: 6, color: "#F59E0B" },
-  { name: "Jasa Logistik", value: 4, color: "#3B82F6" },
-  { name: "Lain-lain", value: 4, color: "#6B7280" },
-];
-const dataPenerbitanSkalaUsaha = [
-  { name: "Mikro", value: 63, color: "#8B5CF6" },
-  { name: "Kecil", value: 11, color: "#EC4899" },
-  { name: "Menengah", value: 1, color: "#F59E0B" },
-  { name: "Besar", value: 1, color: "#EF4444" },
-];
-
-const COLORS_JENIS_PRODUK = dataPendaftaranJenisProduk.map(d => d.color);
-const COLORS_SKALA_USAHA = dataPendaftaranSkalaUsaha.map(d => d.color);
-
-// Kolom untuk tabel dinamis & CSV
+// Kolom untuk tabel dinamis & CSV (TETAP DIPERLUKAN)
 const jenisProdukColumns = [ { header: 'Jenis Produk', key: 'name' }, { header: 'Jumlah', key: 'value', align: 'right' }, ];
 const skalaUsahaColumns = [ { header: 'Skala Usaha', key: 'name' }, { header: 'Jumlah', key: 'value', align: 'right' }, ];
 
@@ -78,32 +48,44 @@ const AnimatedNumber = ({ value }) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-50px" });
   useEffect(() => {
+    // Jika tidak terlihat, langsung set nilainya
+    if (!isInView && ref.current) {
+        ref.current.textContent = value.toLocaleString('id-ID');
+        return;
+    }
+    // Jika terlihat, animasikan
     if (isInView && ref.current) {
       animate(0, value, { duration: 1.5, ease: "easeOut",
         onUpdate: (latest) => { if (ref.current) ref.current.textContent = Math.round(latest).toLocaleString('id-ID'); },
       });
     }
   }, [isInView, value]);
-  return <span ref={ref}>0</span>;
+  return <span ref={ref}>{value.toLocaleString('id-ID')}</span>; // Tampilkan nilai awal agar tidak 0
 };
 
-// --- 4. Komponen Kartu KPI (Gaya Baru) ---
+// --- 4. Komponen Kartu KPI (Gaya Kependudukan) ---
 const KpiCard = ({ icon, title, value, color, theme }) => {
-  const cardVariant = { hidden: { opacity: 0, y: -20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } } };
-  const cardBgColor = theme === 'dark' ? 'rgba(30, 41, 59, 0.5)' : 'rgba(255, 255, 255, 0.6)'; // Slate dark/white transparan
-  const cardBorderColor = theme === 'dark' ? 'rgba(56, 189, 248, 0.2)' : 'rgba(14, 165, 233, 0.2)'; // Sky blue border
+  const cardVariant = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } } };
+  
+  const cardBackground = theme === 'dark' 
+    ? `linear-gradient(140deg, ${color}1A 0%, #2E1A47 50%)`
+    : `linear-gradient(140deg, ${color}1A 0%, #FFFFFF 50%)`;
 
   return (
-    <motion.div variants={cardVariant} className="relative w-full overflow-hidden rounded-lg p-5 backdrop-blur-md border"
-      style={{ backgroundColor: cardBgColor, borderColor: cardBorderColor }} >
+    <motion.div
+      variants={cardVariant}
+      className={`relative w-full overflow-hidden rounded-2xl p-5 shadow-lg`}
+      style={{ background: cardBackground }}
+      whileHover={{ scale: 1.03 }}
+      transition={{ type: "spring", stiffness: 300, damping: 15 }}
+    >
       <div className="flex items-center space-x-4">
-        <div className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center"
-             style={{ background: `linear-gradient(135deg, ${color}66 0%, ${color}99 100%)` }}>
-          {React.cloneElement(icon, { style: { color: 'white' }, className: "w-5 h-5" })}
+        <div className="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: `${color}20` }}>
+          {React.cloneElement(icon, { style: { color: color }, className: "w-6 h-6" })}
         </div>
         <div>
-          <h3 className={`text-sm font-medium uppercase tracking-wider ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{title}</h3>
-          <p className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`} style={{ color: color }}>
+          <h3 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{title}</h3>
+          <p className={`text-3xl font-bold ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'}`} style={{ color: color }}>
             <AnimatedNumber value={value} />
           </p>
         </div>
@@ -112,11 +94,11 @@ const KpiCard = ({ icon, title, value, color, theme }) => {
   );
 };
 
-// --- 5. Komponen Kartu Chart (Gaya Baru) ---
+// --- 5. Komponen Kartu Chart (Gaya Kependudukan) ---
 const ChartCard = ({ title, children, csvData, csvFilename, csvColumns, className = "" }) => {
   const { theme } = useTheme();
   const itemVariant = { hidden: { opacity: 0, scale: 0.95 }, visible: { opacity: 1, scale: 1, transition: { duration: 0.5, ease: 'easeOut' } } };
-  const handleDownloadCSV = () => { /* ... fungsi download CSV ... */
+  const handleDownloadCSV = () => {
     if (!csvData || csvData.length === 0 || !csvColumns || csvColumns.length === 0) return;
     const headers = csvColumns.map(col => col.header);
     const keys = csvColumns.map(col => col.key);
@@ -139,20 +121,23 @@ const ChartCard = ({ title, children, csvData, csvFilename, csvColumns, classNam
     link.click();
     document.body.removeChild(link);
   };
-  const cardBgColor = theme === 'dark' ? 'rgba(30, 41, 59, 0.3)' : 'rgba(255, 255, 255, 0.4)';
-  const cardBorderColor = theme === 'dark' ? 'rgba(56, 189, 248, 0.1)' : 'rgba(14, 165, 233, 0.1)';
+
+  // Gaya dari Kependudukan
+  const cardBgColor = theme === 'dark' ? '#2E1A47' : '#FFFFFF';
+  const titleColor = theme === 'dark' ? 'text-white' : 'text-gray-900';
+  const downloadButtonColor = theme === 'dark' 
+      ? 'bg-purple-500 text-gray-900 hover:bg-purple-400 focus:ring-purple-400 focus:ring-offset-gray-800' 
+      : 'bg-purple-600 text-white hover:bg-purple-700 focus:ring-purple-600 focus:ring-offset-white';
 
   return (
-    <motion.div variants={itemVariant} className={`rounded-lg backdrop-blur-sm border overflow-hidden ${className}`}
-      style={{ backgroundColor: cardBgColor, borderColor: cardBorderColor }} >
+    <motion.div variants={itemVariant} className={`rounded-2xl shadow-xl overflow-hidden ${className}`}
+      style={{ backgroundColor: cardBgColor }} >
       <div className="p-4 sm:p-5">
         <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-3 gap-2">
-          <h3 className={`text-md font-semibold ${theme === 'dark' ? 'text-sky-100' : 'text-sky-900'}`}> {title} </h3>
-          {/* --- AWAL PERUBAHAN: Teks tombol download --- */}
-          <button onClick={handleDownloadCSV} className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium transition-colors border ${theme === 'dark' ? 'bg-sky-900/30 border-sky-700/50 text-sky-300 hover:bg-sky-800/50 hover:border-sky-600/50' : 'bg-sky-50 border-sky-200 text-sky-700 hover:bg-sky-100'}`} >
+          <h3 className={`text-md font-semibold ${titleColor}`}> {title} </h3>
+          <button onClick={handleDownloadCSV} className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium transition-colors border ${downloadButtonColor}`} >
             <DownloadIcon className="w-3 h-3" /> Download CSV
           </button>
-          {/* --- AKHIR PERUBAHAN --- */}
         </div>
         <div className="h-56 sm:h-64 min-w-0"> {children} </div>
       </div>
@@ -160,23 +145,23 @@ const ChartCard = ({ title, children, csvData, csvFilename, csvColumns, classNam
   );
 };
 
-// --- 6. Komponen Tombol Filter (Gaya Samping Kiri) ---
+// --- 6. Komponen Tombol Filter (Gaya Kependudukan/Pendidikan) ---
 const SideFilterButton = ({ text, icon, onClick, isActive, theme }) => {
-    const activeBg = theme === 'dark' ? 'bg-sky-700/50' : 'bg-sky-100';
-    const activeText = theme === 'dark' ? 'text-sky-200' : 'text-sky-800';
-    const inactiveText = theme === 'dark' ? 'text-gray-400 hover:text-sky-300' : 'text-gray-500 hover:text-sky-700';
-    const inactiveBgHover = theme === 'dark' ? 'hover:bg-gray-700/30' : 'hover:bg-gray-100/50';
+    const activeBg = theme === 'dark' ? 'bg-purple-600' : 'bg-purple-600';
+    const activeText = theme === 'dark' ? 'text-white' : 'text-white';
+    const inactiveText = theme === 'dark' ? 'text-gray-300 hover:text-white' : 'text-gray-700 hover:text-black';
+    const inactiveBgHover = theme === 'dark' ? 'hover:bg-gray-700/40' : 'hover:bg-gray-100/60';
 
     return (
         <motion.button
             onClick={onClick}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-md font-medium text-left transition-all duration-200 relative ${isActive ? `${activeBg} ${activeText}` : `${inactiveText} ${inactiveBgHover}`}`}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-left transition-all duration-200 relative ${isActive ? `${activeBg} ${activeText}` : `${inactiveText} ${inactiveBgHover}`}`}
             whileTap={{ scale: 0.98 }}
         >
             {isActive && (
                 <motion.div
                     layoutId="filter-highlight-halal-side" // ID unik
-                    className="absolute left-0 top-0 bottom-0 w-1 bg-sky-500 rounded-r-full"
+                    className="absolute left-0 top-0 bottom-0 w-1 bg-yellow-400 rounded-r-full" // Highlight kuning
                     transition={{ type: "spring", stiffness: 500, damping: 30 }}
                 />
             )}
@@ -187,34 +172,37 @@ const SideFilterButton = ({ text, icon, onClick, isActive, theme }) => {
 };
 
 
-// --- 7. Komponen Tooltip Kustom ---
+// --- 7. Komponen Tooltip Kustom (Gaya Kependudukan) ---
 const CustomTooltip = ({ active, payload, label, theme, chartType = 'pie' }) => {
   if (active && payload && payload.length) {
     const data = payload[0]; const item = data.payload.payload || data.payload; const name = label || item.name; const value = data.value;
-    return ( <div className={`rounded-md p-2.5 shadow-lg backdrop-blur-sm ${theme === 'dark' ? 'bg-slate-800/80 border border-slate-700/50' : 'bg-white/80 border border-gray-200/50'}`}>
-        <p className={`font-semibold text-sm mb-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{name}</p>
-        <p className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}> Jumlah: {value.toLocaleString('id-ID')} </p>
-        {chartType === 'pie' && item.percent && ( <p className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}> Persentase: {(item.percent * 100).toFixed(1)}% </p> )}
-      </div> );
+    return ( 
+        <div className={`rounded-lg p-3 shadow-lg ${theme === 'dark' ? 'bg-[#2E1A47] border border-gray-700' : 'bg-white border border-gray-200'}`}>
+            <p className={`font-semibold text-sm mb-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{name}</p>
+            <p className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}> Jumlah: {value.toLocaleString('id-ID')} </p>
+            {chartType === 'pie' && item.percent && ( <p className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}> Persentase: {(item.percent * 100).toFixed(1)}% </p> )}
+        </div> 
+    );
   } return null;
 };
 
-// --- 8. Komponen Tabel Dinamis ---
+// --- 8. Komponen Tabel Dinamis (Gaya Kependudukan) ---
 const DynamicTable = ({ data, columns, theme }) => {
     if (!data || data.length === 0) {
         return <p className={`text-center text-sm ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Tidak ada data untuk ditampilkan.</p>;
     }
-    const tableBg = theme === 'dark' ? 'bg-slate-800/30' : 'bg-white/40';
-    const tableBorder = theme === 'dark' ? 'border-slate-700/50' : 'border-gray-200/50';
-    const headerBg = theme === 'dark' ? 'bg-slate-900' : 'bg-gray-50';
-    const headerText = theme === 'dark' ? 'text-gray-400' : 'text-gray-500';
-    const rowBorder = theme === 'dark' ? 'divide-slate-700/50' : 'divide-gray-200/50';
-    const rowHover = theme === 'dark' ? 'hover:bg-slate-700/30' : 'hover:bg-gray-50/50';
-    const cellText = theme === 'dark' ? 'text-gray-300' : 'text-gray-600';
+    // Gaya dari Kependudukan
+    const tableBg = theme === 'dark' ? 'bg-gray-900' : 'bg-white';
+    const tableBorder = theme === 'dark' ? 'border-gray-700' : 'border-gray-200';
+    const headerBg = theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50';
+    const headerText = theme === 'dark' ? 'text-gray-300' : 'text-gray-500';
+    const rowBorder = theme === 'dark' ? 'divide-gray-700' : 'divide-gray-200';
+    const rowHover = theme === 'dark' ? 'hover:bg-gray-800' : 'hover:bg-gray-50';
+    const cellText = theme === 'dark' ? 'text-gray-300' : 'text-gray-500';
     const cellTextPrimary = theme === 'dark' ? 'text-white' : 'text-gray-900';
 
     return (
-        <div className={`w-full max-h-80 overflow-y-auto rounded-lg border backdrop-blur-sm ${tableBg} ${tableBorder}`}>
+        <div className={`w-full max-h-80 overflow-y-auto rounded-lg border ${tableBg} ${tableBorder}`}>
             <table className="min-w-full divide-y ${rowBorder}">
                 <thead className={`sticky top-0 ${headerBg}`}>
                     <tr>
@@ -245,22 +233,67 @@ const DynamicTable = ({ data, columns, theme }) => {
 // --- 9. Komponen Utama SertifikasiHalal ---
 const SertifikasiHalal = () => {
   const { theme } = useTheme();
+
+  // --- Ambil data dari Redux Store ---
+  const { data, status } = useSelector((state) => state.landingData);
+
   const [filter, setFilter] = useState('pendaftaran'); // 'pendaftaran' atau 'penerbitan'
-  const [tableData, setTableData] = useState(dataPendaftaranJenisProduk);
+  const [tableData, setTableData] = useState([]);
   const [tableColumns, setTableColumns] = useState(jenisProdukColumns);
   const [tableTitle, setTableTitle] = useState("Rincian Pendaftaran per Jenis Produk");
 
-  const legendColor = theme === 'dark' ? '#9ca3af' : '#6b7280';
+  // --- Latar Belakang & Warna (Gaya Kependudukan) ---
+  const backgroundStyle = theme === 'dark' 
+    ? { backgroundColor: "#210F37" } 
+    : { backgroundColor: "#E4EFE7" };
+  const legendColor = theme === 'dark' ? '#D1D5DB' : '#374151';
 
-  // --- AWAL PERUBAHAN: Menambahkan ikon ke filter ---
+  // --- Loading dan Error State ---
+  if (status === 'loading' || status === 'idle') {
+    return (
+      <div className={`w-full min-h-screen flex items-center justify-center p-4 text-center`} style={backgroundStyle}>
+        <p className={`text-lg ${theme === 'dark' ? 'text-purple-300' : 'text-gray-700'}`}>
+          Memuat Data Sertifikasi Halal...
+        </p>
+      </div>
+    );
+  }
+  
+  if (status === 'failed' || !data || !data.halal) {
+      return (
+        <div className={`w-full min-h-screen flex items-center justify-center p-4 text-center`} style={backgroundStyle}>
+          <p className={`text-lg ${theme === 'dark' ? 'text-red-400' : 'text-red-600'}`}>
+            Gagal memuat Data Sertifikasi Halal. Silakan coba muat ulang halaman.
+          </p>
+        </div>
+      );
+  }
+
+  // --- PERBAIKAN: Ekstrak array .data dari dalam objek ---
+  const dataPendaftaranJenisProduk = data.halal.pendaftaranJenisProduk?.data || [];
+  const dataPendaftaranSkalaUsaha = data.halal.pendaftaranSkalaUsaha?.data || [];
+  const dataPenerbitanJenisProduk = data.halal.penerbitanJenisProduk?.data || [];
+  const dataPenerbitanSkalaUsaha = data.halal.penerbitanSkalaUsaha?.data || [];
+  const dataTotal = data.halal.total || { totalPendaftaran: 0, totalPenerbitan: 0 };
+
+  const totalPendaftaran = dataTotal.totalPendaftaran;
+  const totalPenerbitan = dataTotal.totalPenerbitan;
+  // --- AKHIR PERBAIKAN ---
+
+  // Definisikan warna di dalam komponen
+  const COLORS_JENIS_PRODUK = ["#10B981", "#F59E0B", "#3B82F6", "#6B7280"];
+  const COLORS_SKALA_USAHA = ["#8B5CF6", "#EC4899", "#F59E0B", "#EF4444"];
+
   const filters = [
     { key: 'pendaftaran', text: 'Data Pendaftaran', icon: <RegisterIcon /> }, 
     { key: 'penerbitan', text: 'Data Penerbitan', icon: <PublishIcon /> }, 
   ];
-  // --- AKHIR PERUBAHAN ---
 
   // Update tabel data saat filter berubah
   useEffect(() => {
+    if (!data || !data.halal) return; // Pastikan data ada
+
+    // --- PERBAIKAN: Gunakan variabel yang sudah diekstrak ---
     if (filter === 'pendaftaran') {
       setTableData([...dataPendaftaranJenisProduk, ...dataPendaftaranSkalaUsaha]); 
       setTableColumns([ { header: 'Kategori', key: 'name' }, { header: 'Jumlah', key: 'value', align: 'right' }, ]);
@@ -270,63 +303,59 @@ const SertifikasiHalal = () => {
       setTableColumns([ { header: 'Kategori', key: 'name' }, { header: 'Jumlah', key: 'value', align: 'right' }, ]);
       setTableTitle("Rincian Data Penerbitan");
     }
-  }, [filter]);
+    // --- AKHIR PERBAIKAN ---
+  }, [filter, data, dataPendaftaranJenisProduk, dataPendaftaranSkalaUsaha, dataPenerbitanJenisProduk, dataPenerbitanSkalaUsaha]); // Tambahkan dependensi yang benar
 
   // Varian animasi
   const containerVariant = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 0.5, staggerChildren: 0.1 } } };
   const itemVariant = { hidden: { opacity: 0, y: 15 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } } };
   const chartSectionVariant = { hidden: { opacity: 0, x: 20 }, visible: { opacity: 1, x: 0, transition: { duration: 0.4, ease: 'easeOut', staggerChildren: 0.1 } }, exit: { opacity: 0, x: -20, transition: { duration: 0.3, ease: 'easeIn' } } };
   
-  // Background baru
-  const backgroundStyle = theme === 'dark' 
-    ? { background: 'radial-gradient(circle at top left, #210E37 0%, #201033 100%)' } 
-    : { background: 'radial-gradient(circle at top left, #f1f5f9 0%, #dbeafe 100%)' }; // Light slate ke light blue
 
   return (
     <motion.div id="sertifikasi-halal" className="w-full min-h-screen py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden"
       style={backgroundStyle} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.05 }} variants={containerVariant} >
-      {/* Elemen dekoratif */}
-      <div className={`absolute top-60 right-20 w-96 h-96 rounded-full filter blur-3xl opacity-30 -translate-y-1/2 translate-x-1/2 ${theme === 'dark' ? 'bg-indigo-700' : 'bg-sky-200'}`}></div>
-      <div className={`absolute bottom-60 left-50 w-80 h-80 rounded-full filter blur-3xl opacity-30 translate-y-1/2 -translate-x-1/2 ${theme === 'dark' ? 'bg-indigo-900' : 'bg-indigo-200'}`}></div>
+      {/* Elemen dekoratif (Gaya Kependudukan) */}
+      <div className={`absolute top-0 left-1/4 w-72 h-72 rounded-full filter blur-3xl opacity-20 -translate-x-1/2 -translate-y-1/3 ${theme === 'dark' ? 'bg-purple-800' : 'bg-purple-200'}`}></div>
+      <div className={`absolute bottom-0 right-1/4 w-80 h-80 rounded-full filter blur-3xl opacity-15 translate-x-1/2 translate-y-1/3 ${theme === 'dark' ? 'bg-pink-700' : 'bg-pink-100'}`}></div>
+
 
       <div className="mx-auto md:mx-12 relative z-10">
-        {/* Judul Sesi */}
+        {/* Judul Sesi (Gaya Kependudukan) */}
         <motion.div className="text-center mb-10" variants={itemVariant} >
-          <h2 className={`text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r ${theme === 'dark' ? 'from-sky-300 to-indigo-400' : 'from-sky-600 to-indigo-700'}`}>
+          <h2 className={`text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r ${theme === 'dark' ? 'from-purple-400 to-pink-500' : 'from-emerald-700 to-green-900'}`}>
             Sertifikasi Halal
           </h2>
-          <p className={`mt-3 text-lg max-w-2xl mx-auto ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+          <p className={`mt-3 text-lg max-w-2xl mx-auto ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
             Statistik Pendaftaran dan Penerbitan Sertifikat Halal di Kota Medan.
           </p>
         </motion.div>
 
-        {/* Kartu KPI di Atas */}
+        {/* Kartu KPI di Atas (Gaya Kependudukan) */}
         <motion.div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-10" variants={containerVariant} >
-          <KpiCard title="Total Pendaftaran" value={totalPendaftaran} icon={<CertificateIcon />} color={theme === 'dark' ? "#7dd3fc" : "#0ea5e9"} theme={theme} />
-          <KpiCard title="Total Sertifikat Terbit" value={totalPenerbitan} icon={<CertificateIcon />} color={theme === 'dark' ? "#818cf8" : "#6366f1"} theme={theme} />
+          <KpiCard title="Total Pendaftaran" value={totalPendaftaran} icon={<RegisterIcon />} color={theme === 'dark' ? "#a78bfa" : "#8b5cf6"} theme={theme} />
+          <KpiCard title="Total Sertifikat Terbit" value={totalPenerbitan} icon={<CertificateIcon />} color={theme === 'dark' ? "#f472b6" : "#db2777"} theme={theme} />
         </motion.div>
 
         {/* Layout Utama: Filter Kiri, Konten Kanan */}
         <div className="flex flex-col md:flex-row gap-8">
 
-          {/* Kolom Filter Kiri */}
+          {/* Kolom Filter Kiri (Gaya Kependudukan) */}
           <motion.div className="w-full md:w-1/4 lg:w-1/5" variants={itemVariant}>
-            {/* --- AWAL PERUBAHAN: Menambahkan deskripsi di filter --- */}
-            <div className={`rounded-lg p-3 space-y-2 backdrop-blur-sm border ${theme === 'dark' ? 'bg-slate-800/40 border-slate-700/50' : 'bg-white/50 border-gray-200/50'}`}>
-              <h4 className={`px-2 text-xs font-semibold uppercase tracking-wider mb-1 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Filter Data</h4>
-               <p className={`px-2 text-xs mb-3 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Pilih jenis data yang ingin ditampilkan pada grafik dan tabel di samping.</p>
+            <div className={`rounded-2xl p-4 space-y-2 shadow-xl ${theme === 'dark' ? 'bg-[#2E1A47]' : 'bg-white'}`}>
+              <h4 className={`px-2 text-xs font-semibold uppercase tracking-wider mb-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Filter Data</h4>
+               <p className={`px-2 text-xs mb-3 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Pilih jenis data yang ingin ditampilkan.</p>
                {filters.map(f => (
                 <SideFilterButton key={f.key} text={f.text} icon={f.icon} onClick={() => setFilter(f.key)} isActive={filter === f.key} theme={theme} />
               ))}
             </div>
-             {/* --- AKHIR PERUBAHAN --- */}
           </motion.div>
 
           {/* Kolom Konten Kanan */}
           <div className="w-full md:w-3/4 lg:w-4/5">
             {/* Kontainer Chart Vertikal */}
             <AnimatePresence mode="wait">
-              <motion.div key={filter} // Key diganti agar AnimatePresence mendeteksi perubahan
+              <motion.div key={filter}
                 variants={chartSectionVariant} initial="hidden" animate="visible" exit="exit" className="flex flex-col gap-6 mb-8" >
                 {filter === 'pendaftaran' && (
                   <>
@@ -383,10 +412,12 @@ const SertifikasiHalal = () => {
               </motion.div>
             </AnimatePresence>
 
-            {/* Tabel Dinamis di Bawah Chart */}
-            <motion.div variants={itemVariant}>
-               <h3 className={`text-xl font-semibold mb-4 ${theme === 'dark' ? 'text-sky-100' : 'text-sky-900'}`}>{tableTitle}</h3>
-               <DynamicTable data={tableData} columns={tableColumns} theme={theme} />
+            {/* Tabel Dinamis di Bawah Chart (Gaya Kependudukan) */}
+            <motion.div variants={itemVariant} className={`rounded-2xl shadow-xl overflow-hidden ${theme === 'dark' ? 'bg-[#2E1A47]' : 'bg-white'}`}>
+               <div className="p-4 sm:p-5">
+                   <h3 className={`text-xl font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{tableTitle}</h3>
+                   <DynamicTable data={tableData} columns={tableColumns} theme={theme} />
+                </div>
             </motion.div>
 
           </div> {/* End Kolom Konten Kanan */}

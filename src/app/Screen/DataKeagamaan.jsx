@@ -17,9 +17,10 @@ import {
   AreaChart,
   Area,
 } from "recharts";
+// Import useSelector untuk mengambil data dari Redux
+import { useSelector } from "react-redux";
 
 // --- 1. Ikon SVG Kustom ---
-// (Ikon yang sudah ada)
 const ReligionIcon = (props) => (
     <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"> <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m-7.519 2.27A9.094 9.094 0 0112 18.72a9.094 9.094 0 01-3.741-.479 3 3 0 00-4.682-2.72m7.519 2.27c.459.083.92.146 1.395.192 1.02.087 2.07.14 3.15.14 1.08 0 2.13-.053 3.15-.14a2.25 2.25 0 011.664 2.284 2.25 2.25 0 01-1.664 2.284c-1.02.087-2.07.14-3.15.14-1.08 0-2.13-.053-3.15-.14a2.25 2.25 0 01-1.664-2.284 2.25 2.25 0 011.664-2.284zM12 14.25a3 3 0 100-6 3 3 0 000 6z" /> </svg>
 );
@@ -51,7 +52,6 @@ const BarIcon = (props) => (
         <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 1.085-1.085-1.085m0 0V14.25m1.085-1.085l1.085 1.085m0 0l1.085-1.085m-1.085 1.085l-1.085-1.085m0 0V14.25m-6.75 2.25h6.75" />
     </svg>
 );
-// (Ikon Baru)
 const BookOpenIcon = (props) => (
     <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18c-2.305 0-4.408.867-6 2.292m0-14.25v14.25" />
@@ -73,415 +73,104 @@ const ShieldCheckIcon = (props) => (
     </svg>
 );
 
+// --- 2. Kolom Tabel ---
+const pendudukAgamaColumns = [ { header: 'Agama', key: 'name' }, { header: 'Jumlah', key: 'value', align: 'right' }, ];
+const rumahIbadahColumns = [ { header: 'Jenis', key: 'name' }, { header: 'Jumlah', key: 'value', align: 'right' }, ];
+const tipologiMasjidColumns = [ { header: 'Tipologi', key: 'name' }, { header: 'Jumlah', key: 'value', align: 'right' }, ];
+const penyuluhAgamaColumns = [ { header: 'Agama', key: 'name' }, { header: 'PNS', key: 'pns', align: 'right' }, { header: 'PPPK', key: 'pppk', align: 'right' }, { header: 'Non ASN', key: 'nonasn', align: 'right' }, { header: 'Total', key: 'total', align: 'right' }, ];
+const kuaTipologiColumns = [ { header: 'Tipologi', key: 'name' }, { header: 'Jumlah', key: 'value', align: 'right' }, ];
+const penghuluJabatanColumns = [ { header: 'Jabatan', key: 'name' }, { header: 'Jumlah', key: 'value', align: 'right' }, ];
+const nikahBulanColumns = [ { header: 'Bulan', key: 'bulan' }, { header: 'Jumlah Nikah', key: 'total', align: 'right' }, ];
+const tanahWakafPemanfaatanColumns = [ { header: 'Pemanfaatan', key: 'name' }, { header: 'Jumlah', key: 'value', align: 'right' }, ];
+const penyuluhTunjanganColumns = [ { header: 'Agama', key: 'name' }, { header: 'Penerima Tunjangan', key: 'value', align: 'right' }, ];
+const sasaranPenyuluhanColumns = [ { header: 'Agama', key: 'name' }, { header: 'Jumlah Sasaran', key: 'value', align: 'right' }, ];
+const penyuluhDetailColumns = [ { header: 'Agama', key: 'agama' }, { header: 'Laki-laki', key: 'laki', align: 'right' }, { header: 'Perempuan', key: 'perempuan', align: 'right' }, { header: 'Total Gender', key: 'totalGender', align: 'right' }, { header: 'ASN', key: 'asn', align: 'right' }, { header: 'Non ASN', key: 'nonAsn', align: 'right' }, { header: 'Total Status', key: 'totalStatus', align: 'right' }, ];
+const nikahTempatColumns = [ { header: 'Tempat', key: 'name' }, { header: 'Jumlah', key: 'value', align: 'right' }, ];
+const peristiwaRujukColumns = [ { header: 'KUA Kecamatan', key: 'kua' }, { header: 'Jan', key: 'jan', align: 'right' }, { header: 'Feb', key: 'feb', align: 'right' }, { header: 'Mar', key: 'mar', align: 'right' }, { header: 'Apr', key: 'apr', align: 'right' }, { header: 'Mei', key: 'mei', align: 'right' }, { header: 'Jun', key: 'jun', align: 'right' }, { header: 'Total (Jan-Jun)', key: 'total', align: 'right' }, ];
+const kuaTanahColumns = [ { header: 'Status Tanah', key: 'name' }, { header: 'Jumlah', key: 'value', align: 'right' }, ];
+const kuaBangunanColumns = [ { header: 'Kondisi Bangunan', key: 'name' }, { header: 'Jumlah', key: 'value', align: 'right' }, ];
+const kuaRevitalisasiColumns = [ { header: 'Jenis Revitalisasi', key: 'name' }, { header: 'Jumlah', key: 'value', align: 'right' }, ];
+const bukuNikahColumns = [ { header: 'KUA Kecamatan', key: 'kua' }, { header: 'Buku Nikah', key: 'buku', align: 'right' }, { header: 'Kartu Nikah', key: 'kartu', align: 'right' }, ];
+const balaiNikahColumns = [ { header: 'KUA', key: 'kua' }, { header: 'Balai Nikah', key: 'balai_nikah', align: 'right' }, { header: 'Jumlah', key: 'jumlah', align: 'right' }, ];
+const penghuluPembinaanColumns = [ { header: 'Tingkat Jabatan', key: 'name' }, { header: 'Jumlah Dibina', key: 'value', align: 'right' }, ];
+const kasusKonflikColumns = [ { header: 'Kecamatan', key: 'kecamatan' }, { header: 'Jumlah Konflik', key: 'konflik', align: 'right' }, { header: 'Penyelesaian', key: 'penyelesaian', align: 'right' }, ];
+const kasusKonfrontatifColumns = [ { header: 'Kecamatan', key: 'kecamatan' }, { header: 'Jumlah Kasus', key: 'kasus', align: 'right' }, { header: 'Penyelesaian', key: 'penyelesaian', align: 'right' }, ];
+const dialogAntarUmatColumns = [ { header: 'Kecamatan', key: 'kecamatan' }, { header: 'Jumlah Kegiatan', key: 'kegiatan', align: 'right' }, ];
+const dialogInternUmatColumns = [ { header: 'Agama', key: 'agama' }, { header: 'Jumlah Kegiatan', key: 'kegiatan', align: 'right' }, ];
+const qariHafidzColumns = [ { header: 'Kategori', key: 'kategori' }, { header: 'Laki-laki', key: 'lk', align: 'right' }, { header: 'Perempuan', key: 'pr', align: 'right' }, { header: 'Total', key: 'total', align: 'right' }, ];
 
-// --- 2. Data dari Teks Anda (SUDAH DIPERBARUI DAN LENGKAP) ---
 
-// 1. Data Penduduk Berdasarkan Agama
-// Data (1641401) sudah dikoreksi dari typo CSV (16414011) agar sesuai total
-const dataPendudukAgama = [
-    { name: "Islam", value: 1641401, color: "#34D399" },
-    { name: "Kristen", value: 480471, color: "#60A5FA" },
-    { name: "Katolik", value: 332573, color: "#A78BFA" },
-    { name: "Buddha", value: 230945, color: "#F59E0B" },
-    { name: "Hindu", value: 10945, color: "#EF4444" },
-    { name: "Khonghucu", value: 11194, color: "#9CA3AF" },
-];
-// Total JS (2706829) sedikit berbeda dari total CSV (2706890), tapi data individu sudah sesuai
-const totalPenduduk = dataPendudukAgama.reduce((sum, item) => sum + item.value, 0);
-const COLORS_AGAMA = dataPendudukAgama.map(d => d.color);
+// --- 3. Komponen Angka Animasi (Gaya Kependudukan) ---
+const AnimatedNumber = ({ value, isDecimal = false }) => {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-50px" });
 
-// 2. Data Rumah Ibadah (Diisi dengan data contoh yang disetujui, karena CSV kosong)
-const dataRumahIbadah = [
-    { name: "Masjid", value: 1106, color: "#10B981" }, // Diambil dari total data tipologi masjid
-    { name: "Gereja Kristen", value: 1250, color: "#3B82F6" }, // Angka contoh
-    { name: "Gereja Katolik", value: 350, color: "#6366F1" },  // Angka contoh
-    { name: "Pura", value: 15, color: "#F59E0B" },     // Angka contoh
-    { name: "Vihara", value: 180, color: "#EF4444" },    // Angka contoh
-    { name: "Klenteng", value: 75, color: "#6B7280" },   // Angka contoh
-];
-const totalRumahIbadah = dataRumahIbadah.reduce((sum, item) => sum + item.value, 0);
-const COLORS_RUMAH_IBADAH = dataRumahIbadah.map(d => d.color);
-
-// 3. Data Tipologi Masjid
-const dataTipologiMasjid = [
-    { name: "Masjid Raya", value: 1, color: "#3B82F6" },
-    { name: "Masjid Agung", value: 1, color: "#10B981" },
-    { name: "Masjid Besar", value: 4, color: "#F59E0B" },
-    { name: "Masjid Jami'", value: 668, color: "#EF4444" },
-    { name: "Masjid Bersejarah", value: 2, color: "#A78BFA" },
-    { name: "Masjid Tempat Publik", value: 430, color: "#6B7280" },
-];
-const totalMasjid = dataTipologiMasjid.reduce((sum, item) => sum + item.value, 0);
-const COLORS_TIPOLOGI = dataTipologiMasjid.map(d => d.color);
-
-// 4. Data Total Penyuluh Berdasarkan Status Kepegawaian
-const dataPenyuluhTotal = [
-    { name: "PNS", value: 28, color: "#34d399" },
-    { name: "PPPK", value: 82, color: "#60a5fa" },
-    { name: "Non ASN", value: 49, color: "#f59e0b" },
-];
-const totalPenyuluh = dataPenyuluhTotal.reduce((sum, item) => sum + item.value, 0);
-
-// 5. Data Rangkuman Penyuluh Berdasarkan Agama dan Status
-const dataPenyuluhAgama = [
-    { name: "Islam", pns: 17, pppk: 44, nonasn: 16, total: 77 },
-    { name: "Kristen", pns: 9, pppk: 33, nonasn: 1, total: 43 },
-    { name: "Katolik", pns: 0, pppk: 5, nonasn: 24, total: 29 },
-    { name: "Hindu", pns: 1, pppk: 0, nonasn: 3, total: 4 },
-    { name: "Buddha", pns: 1, pppk: 0, nonasn: 5, total: 6 },
-    { name: "Khonghucu", pns: 0, pppk: 0, nonasn: 0, total: 0 },
-];
-
-// 6. Data Rincian Penyuluh (Baru Ditambahkan)
-const dataPenyuluhDetail = {
-    islam: {
-        gender: { laki: 57, perempuan: 20 },
-        status: { asn: 61, nonAsn: 16 },
-        pns: { laki: 9, perempuan: 8, total: 17, pendidikan: { diBawahS1: 0, s1: 5, diAtasS1: 12 } },
-        pppk: { laki: 33, perempuan: 11, total: 44, pendidikan: { diBawahS1: 0, s1: 35, diAtasS1: 9 } },
-        nonAsn: { laki: 15, perempuan: 1, total: 16, pendidikan: { diBawahS1: 0, s1: 14, diAtasS1: 2 } },
-    },
-    kristen: {
-        gender: { laki: 20, perempuan: 23 },
-        status: { asn: 42, nonAsn: 1 },
-        pns: { laki: 5, perempuan: 4, total: 9, pendidikan: { diBawahS1: 0, s1: 1, diAtasS1: 18 } },
-        nonAsn: { laki: 1, perempuan: 0, total: 1, pendidikan: { diBawahS1: 0, s1: 1, diAtasS1: 0 } },
-    },
-    katolik: {
-        gender: { laki: 21, perempuan: 8 },
-        status: { asn: 5, nonAsn: 24 },
-        pns: { laki: 0, perempuan: 0, total: 0, pendidikan: { diBawahS1: 0, s1: 0, diAtasS1: 0 } },
-        pppk: { laki: 5, perempuan: 0, total: 5, pendidikan: { diBawahS1: 0, s1: 5, diAtasS1: 0 } },
-        nonAsn: { laki: 16, perempuan: 8, total: 24, pendidikan: { diBawahS1: 3, s1: 21, diAtasS1: 0 } },
-    },
-    hindu: {
-        gender: { laki: 3, perempuan: 1 },
-        status: { asn: 1, nonAsn: 3 },
-        pns: { laki: 1, perempuan: 0, total: 1, pendidikan: { diBawahS1: 0, s1: 1, diAtasS1: 0 } },
-        nonAsn: { laki: 2, perempuan: 1, total: 3, pendidikan: { diBawahS1: 1, s1: 2, diAtasS1: 0 } },
-    },
-    buddha: {
-        gender: { laki: 5, perempuan: 1 },
-        status: { asn: 1, nonAsn: 5 },
-        pppk: { laki: 0, perempuan: 0, total: 0, pendidikan: { diBawahS1: 0, s1: 0, diAtasS1: 0 } },
-        nonAsn: { laki: 4, perempuan: 1, total: 5, pendidikan: { diBawahS1: 0, s1: 4, diAtasS1: 1 } },
-    },
-    khonghucu: {
-        gender: { laki: 0, perempuan: 0 },
-        status: { asn: 0, nonAsn: 0 },
-        pns: { laki: 0, perempuan: 0, total: 0, pendidikan: { diBawahS1: 0, s1: 0, diAtasS1: 0 } },
-        pppk: { laki: 0, perempuan: 0, total: 0, pendidikan: { diBawahS1: 0, s1: 0, diAtasS1: 0 } },
-        nonAsn: { laki: 0, perempuan: 0, total: 0, pendidikan: { diBawahS1: 0, s1: 0, diAtasS1: 0 } },
+  useEffect(() => {
+    // Tampilkan nilai akhir jika tidak di viewport
+    if (!isInView && ref.current) {
+        ref.current.textContent = value.toLocaleString('id-ID', { 
+            minimumFractionDigits: isDecimal ? 2 : 0, 
+            maximumFractionDigits: isDecimal ? 2 : 0 
+        });
+        return;
     }
+    if (isInView && ref.current) {
+      animate(0, value, {
+        duration: 2.0,
+        ease: "easeOut",
+        onUpdate: (latest) => {
+          if (ref.current) {
+            if (isDecimal) {
+              ref.current.textContent = latest.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            } else {
+              ref.current.textContent = Math.round(latest).toLocaleString('id-ID');
+            }
+          }
+        },
+      });
+    }
+  }, [isInView, value, isDecimal]);
+
+  // Tampilkan nilai awal 0 atau 0,00
+  return <span ref={ref}>{isDecimal ? "0,00" : "0"}</span>;
 };
 
-// 7. Data Penyuluh Non ASN Penerima Tunjangan
-const dataPenyuluhTunjangan = [
-    { name: "Islam", value: 97, color: "#10B981" },
-    { name: "Katolik", value: 24, color: "#6366F1" },
-    { name: "Buddha", value: 5, color: "#EF4444" },
-    { name: "Hindu", value: 3, color: "#F59E0B" },
-    { name: "Kristen", value: 1, color: "#3B82F6" },
-    { name: "Khonghucu", value: 0, color: "#6B7280" },
-];
-const totalPenyuluhTunjangan = dataPenyuluhTunjangan.reduce((sum, item) => sum + item.value, 0);
+// --- 4. Komponen Kartu KPI (Gaya Kependudukan) ---
+const KpiCard = ({ icon, title, value, color, theme, suffix = "", isDecimal = false }) => {
+  const cardVariant = {
+    hidden: { opacity: 0, y: 30 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } }
+  };
+  
+  const cardBackground = theme === 'dark' 
+    ? `linear-gradient(140deg, ${color}1A 0%, #2E1A47 50%)`
+    : `linear-gradient(140deg, ${color}1A 0%, #FFFFFF 50%)`;
 
-// 8. Data Sasaran Bimbingan Penyuluhan
-const dataSasaranPenyuluhan = [
-    { name: "Islam", value: 350, color: "#10B981" },
-    { name: "Katolik", value: 30, color: "#6366F1" },
-    { name: "Hindu", value: 16, color: "#F59E0B" },
-    { name: "Buddha", value: 12, color: "#EF4444" },
-    { name: "Kristen", value: 8, color: "#3B82F6" },
-    { name: "Khonghucu", value: 0, color: "#6B7280" },
-];
-const totalSasaranPenyuluhan = dataSasaranPenyuluhan.reduce((sum, item) => sum + item.value, 0);
-
-// 9. Data KUA Berdasarkan Tipologi
-const dataKuaTipologi = [
-    { name: "C", value: 15, color: "#F59E0B" },
-    { name: "B", value: 4, color: "#10B981" },
-    { name: "A", value: 2, color: "#3B82F6" },
-    { name: "D1", value: 0, color: "#EF4444" },
-    { name: "D2", value: 0, color: "#A78BFA" },
-];
-const totalKUA = dataKuaTipologi.reduce((sum, item) => sum + item.value, 0);
-
-// 10. Data KUA Status Tanah & Kondisi Bangunan
-const dataKuaStatus = {
-    tanah: { belumSertifikat: 19, sudahSertifikat: 2, total: 21 },
-    bangunan: { baik: 10, rusakRingan: 6, rusakBerat: 5, total: 21 }
-};
-
-// 11. Data Revitalisasi KUA
-const dataRevitalisasiKua = { rehabRingan: 3, rehabBerat: 2, total: 5 };
-
-// 12. Data Penghulu Berdasarkan Jabatan
-const dataPenghuluJabatan = [
-    { name: "Madya", value: 35, color: "#F59E0B" },
-    { name: "Pertama", value: 8, color: "#3B82F6" },
-    { name: "Muda", value: 7, color: "#10B981" },
-    { name: "Utama", value: 0, color: "#EF4444" },
-];
-const totalPenghulu = dataPenghuluJabatan.reduce((sum, item) => sum + item.value, 0);
-
-// 13. Data Peristiwa Nikah Berdasarkan Tempat
-const dataPeristiwaNikahTempat = { kua: 2165, luar: 3556, total: 5721 };
-
-// 14. Data Peristiwa Nikah Bulanan (Total 5514 adalah total yg benar, 5734 di CSV typo)
-const dataPeristiwaNikahBulan = [
-    { bulan: "Jan", total: 937 },
-    { bulan: "Feb", total: 1054 },
-    { bulan: "Mar", total: 253 },
-    { bulan: "Apr", total: 983 },
-    { bulan: "Mei", total: 1175 },
-    { bulan: "Jun", total: 1112 },
-];
-const totalNikahBulanIni = dataPeristiwaNikahBulan.reduce((sum, item) => sum + item.total, 0);
-
-// 15. Data Buku Nikah yang Diedarkan
-const dataBukuNikah = {
-    totalBukuNikah: 11200,
-    totalKartuNikah: 0,
-    rincian: [
-        { kua: "Medan Kota", buku: 200, kartu: 0 }, { kua: "Medan Sunggal", buku: 500, kartu: 0 },
-        { kua: "Medan Helvetia", buku: 600, kartu: 0 }, { kua: "Medan Denai", buku: 800, kartu: 0 },
-        { kua: "Medan Barat", buku: 300, kartu: 0 }, { kua: "Medan Deli", buku: 800, kartu: 0 },
-        { kua: "Medan Tuntungan", buku: 300, kartu: 0 }, { kua: "Medan Belawan", buku: 600, kartu: 0 },
-        { kua: "Medan Amplas", buku: 700, kartu: 0 }, { kua: "Medan Area", buku: 400, kartu: 0 },
-        { kua: "Medan Johor", buku: 600, kartu: 0 }, { kua: "Medan Marelan", buku: 3200, kartu: 0 },
-        { kua: "Medan Labuhan", buku: 600, kartu: 0 }, { kua: "Medan Tembung", buku: 700, kartu: 0 },
-        { kua: "Medan Maimun", buku: 100, kartu: 0 }, { kua: "Medan Polonia", buku: 200, kartu: 0 },
-        { kua: "Medan Baru", buku: 100, kartu: 0 }, { kua: "Medan Perjuangan", buku: 500, kartu: 0 },
-        { kua: "Medan Petisah", buku: 300, kartu: 0 }, { kua: "Medan Timur", buku: 200, kartu: 0 },
-        { kua: "Medan Selayang", buku: 400, kartu: 0 }
-    ]
-};
-
-// 16. Data Peristiwa Rujuk
-const totalPeristiwaRujuk = 0;
-const dataRujuk = {
-  totalRujuk: 0,
-  rincian: [
-    { kua: "Medan Kota", jan: 0, feb: 0, mar: 0, apr: 0, mei: 0, jun: 0, total: 0 },
-    { kua: "Medan Sunggal", jan: 0, feb: 0, mar: 0, apr: 0, mei: 0, jun: 0, total: 0 },
-    { kua: "Medan Helvetia", jan: 0, feb: 0, mar: 0, apr: 0, mei: 0, jun: 0, total: 0 },
-    { kua: "Medan Denai", jan: 0, feb: 0, mar: 0, apr: 0, mei: 0, jun: 0, total: 0 },
-    { kua: "Medan Barat", jan: 0, feb: 0, mar: 0, apr: 0, mei: 0, jun: 0, total: 0 },
-    { kua: "Medan Deli", jan: 0, feb: 0, mar: 0, apr: 0, mei: 0, jun: 0, total: 0 },
-    { kua: "Medan Tuntungan", jan: 0, feb: 0, mar: 0, apr: 0, mei: 0, jun: 0, total: 0 },
-    { kua: "Medan Belawan", jan: 0, feb: 0, mar: 0, apr: 0, mei: 0, jun: 0, total: 0 },
-    { kua: "Medan Amplas", jan: 0, feb: 0, mar: 0, apr: 0, mei: 0, jun: 0, total: 0 },
-    { kua: "Medan Area", jan: 0, feb: 0, mar: 0, apr: 0, mei: 0, jun: 0, total: 0 },
-    { kua: "Medan Johor", jan: 0, feb: 0, mar: 0, apr: 0, mei: 0, jun: 0, total: 0 },
-    { kua: "Medan Marelan", jan: 0, feb: 0, mar: 0, apr: 0, mei: 0, jun: 0, total: 0 },
-    { kua: "Medan Labuhan", jan: 0, feb: 0, mar: 0, apr: 0, mei: 0, jun: 0, total: 0 },
-    { kua: "Medan Tembung", jan: 0, feb: 0, mar: 0, apr: 0, mei: 0, jun: 0, total: 0 },
-    { kua: "Medan Maimun", jan: 0, feb: 0, mar: 0, apr: 0, mei: 0, jun: 0, total: 0 },
-    { kua: "Medan Polonia", jan: 0, feb: 0, mar: 0, apr: 0, mei: 0, jun: 0, total: 0 },
-    { kua: "Medan Baru", jan: 0, feb: 0, mar: 0, apr: 0, mei: 0, jun: 0, total: 0 },
-    { kua: "Medan Perjuangan", jan: 0, feb: 0, mar: 0, apr: 0, mei: 0, jun: 0, total: 0 },
-    { kua: "Medan Petisah", jan: 0, feb: 0, mar: 0, apr: 0, mei: 0, jun: 0, total: 0 },
-    { kua: "Medan Timur", jan: 0, feb: 0, mar: 0, apr: 0, mei: 0, jun: 0, total: 0 },
-    { kua: "Medan Selayang", jan: 0, feb: 0, mar: 0, apr: 0, mei: 0, jun: 0, total: 0 }
-  ]
-};
-
-// 17. Data Tanah Wakaf Berdasarkan Status
-const dataTanahWakafStatus = { belum: 398, sudah: 766, total: 1164 };
-
-// 18. Data Tanah Wakaf Berdasarkan Pemanfaatan
-const dataTanahWakafPemanfaatan = [
-    { name: "Masjid", value: 426, color: "#3B82F6" },
-    { name: "Mushalla", value: 197, color: "#10B981" },
-    { name: "Sekolah/Madrasah", value: 53, color: "#F59E0B" },
-    { name: "Makam", value: 54, color: "#A78BFA" },
-    { name: "Fasilitas Sosial", value: 9, color: "#6B7280" },
-    { name: "Pesantren", value: 0, color: "#EF4444" },
-];
-const totalTanahWakafPemanfaatan = dataTanahWakafPemanfaatan.reduce((sum, item) => sum + item.value, 0);
-const COLORS_WAKAF_MANFAAT = dataTanahWakafPemanfaatan.map(d => d.color);
-
-// 19. Data Tanah Wakaf Produktif
-const totalTanahWakafProduktif = 0;
-
-// 20. DATA BARU (TERLEWAT) - Balai Nikah (CSV Kosong)
-const dataBalaiNikah = []; // Kosong sesuai CSV
-
-// 21. DATA BARU (TERLEWAT) - Penghulu (Pembinaan)
-const dataPenghuluPembinaan = [
-    { name: 'Pertama', value: 0 },
-    { name: 'Muda', value: 0 },
-    { name: 'Madya', value: 0 },
-    { name: 'Utama', value: 0 },
-];
-const totalPenghuluPembinaan = 0;
-
-// 22. DATA BARU (TERLEWAT) - Kasus Konflik (CSV Kosong)
-const dataKasusKonflik = []; // Kosong sesuai CSV
-
-// 23. DATA BARU (TERLEWAT) - Kasus Konfrontatif (CSV Kosong)
-const dataKasusKonfrontatif = []; // Kosong sesuai CSV
-
-// 24. DATA BARU (TERLEWAT) - Dialog Antar Umat (CSV Kosong)
-const dataDialogAntarUmat = []; // Kosong sesuai CSV
-
-// 25. DATA BARU (TERLEWAT) - Dialog Intern Umat (CSV Kosong)
-const dataDialogInternUmat = []; // Kosong sesuai CSV
-
-// 26. DATA BARU (TERLEWAT) - Qari & Hafidz (CSV Kosong)
-const dataQariHafidz = []; // Kosong sesuai CSV
-
-
-// --- Definisi Kolom untuk Tabel (Dilengkapi) ---
-
-const pendudukAgamaColumns = [
-    { header: 'Agama', key: 'name' },
-    { header: 'Jumlah', key: 'value', align: 'right' },
-];
-const rumahIbadahColumns = [
-    { header: 'Jenis', key: 'name' },
-    { header: 'Jumlah', key: 'value', align: 'right' },
-];
-const tipologiMasjidColumns = [
-    { header: 'Tipologi', key: 'name' },
-    { header: 'Jumlah', key: 'value', align: 'right' },
-];
-const penyuluhAgamaColumns = [
-    { header: 'Agama', key: 'name' },
-    { header: 'PNS', key: 'pns', align: 'right' },
-    { header: 'PPPK', key: 'pppk', align: 'right' },
-    { header: 'Non ASN', key: 'nonasn', align: 'right' },
-    { header: 'Total', key: 'total', align: 'right' },
-];
-const kuaTipologiColumns = [
-    { header: 'Tipologi', key: 'name' },
-    { header: 'Jumlah', key: 'value', align: 'right' },
-];
-const penghuluJabatanColumns = [
-    { header: 'Jabatan', key: 'name' },
-    { header: 'Jumlah', key: 'value', align: 'right' },
-];
-const nikahBulanColumns = [
-    { header: 'Bulan', key: 'bulan' },
-    { header: 'Jumlah Nikah', key: 'total', align: 'right' },
-];
-const tanahWakafPemanfaatanColumns = [
-    { header: 'Pemanfaatan', key: 'name' },
-    { header: 'Jumlah', key: 'value', align: 'right' },
-];
-// Kolom baru
-const penyuluhTunjanganColumns = [
-    { header: 'Agama', key: 'name' },
-    { header: 'Penerima Tunjangan', key: 'value', align: 'right' },
-];
-const sasaranPenyuluhanColumns = [
-    { header: 'Agama', key: 'name' },
-    { header: 'Jumlah Sasaran', key: 'value', align: 'right' },
-];
-const penyuluhDetailColumns = [
-    { header: 'Agama', key: 'agama' },
-    { header: 'Laki-laki', key: 'laki', align: 'right' },
-    { header: 'Perempuan', key: 'perempuan', align: 'right' },
-    { header: 'Total Gender', key: 'totalGender', align: 'right' },
-    { header: 'ASN', key: 'asn', align: 'right' },
-    { header: 'Non ASN', key: 'nonAsn', align: 'right' },
-    { header: 'Total Status', key: 'totalStatus', align: 'right' },
-];
-const nikahTempatColumns = [
-    { header: 'Tempat', key: 'name' },
-    { header: 'Jumlah', key: 'value', align: 'right' },
-];
-const peristiwaRujukColumns = [
-    { header: 'KUA Kecamatan', key: 'kua' },
-    { header: 'Jan', key: 'jan', align: 'right' },
-    { header: 'Feb', key: 'feb', align: 'right' },
-    { header: 'Mar', key: 'mar', align: 'right' },
-    { header: 'Apr', key: 'apr', align: 'right' },
-    { header: 'Mei', key: 'mei', align: 'right' },
-    { header: 'Jun', key: 'jun', align: 'right' },
-    { header: 'Total', key: 'total', align: 'right' },
-];
-const kuaTanahColumns = [
-    { header: 'Status Tanah', key: 'name' },
-    { header: 'Jumlah', key: 'value', align: 'right' },
-];
-const kuaBangunanColumns = [
-    { header: 'Kondisi Bangunan', key: 'name' },
-    { header: 'Jumlah', key: 'value', align: 'right' },
-];
-const kuaRevitalisasiColumns = [
-    { header: 'Jenis Revitalisasi', key: 'name' },
-    { header: 'Jumlah', key: 'value', align: 'right' },
-];
-const bukuNikahColumns = [
-    { header: 'KUA Kecamatan', key: 'kua' },
-    { header: 'Buku Nikah', key: 'buku', align: 'right' },
-    { header: 'Kartu Nikah', key: 'kartu', align: 'right' },
-];
-// Kolom untuk data baru (terlewat)
-const balaiNikahColumns = [
-    { header: 'KUA', key: 'kua' },
-    { header: 'Balai Nikah', key: 'balai_nikah', align: 'right' },
-    { header: 'Jumlah', key: 'jumlah', align: 'right' },
-];
-const penghuluPembinaanColumns = [
-    { header: 'Tingkat Jabatan', key: 'name' },
-    { header: 'Jumlah Dibina', key: 'value', align: 'right' },
-];
-const kasusKonflikColumns = [
-    { header: 'Kecamatan', key: 'kecamatan' },
-    { header: 'Jumlah Konflik', key: 'konflik', align: 'right' },
-    { header: 'Penyelesaian', key: 'penyelesaian', align: 'right' },
-];
-const kasusKonfrontatifColumns = [
-    { header: 'Kecamatan', key: 'kecamatan' },
-    { header: 'Jumlah Kasus', key: 'kasus', align: 'right' },
-    { header: 'Penyelesaian', key: 'penyelesaian', align: 'right' },
-];
-const dialogAntarUmatColumns = [
-    { header: 'Kecamatan', key: 'kecamatan' },
-    { header: 'Jumlah Kegiatan', key: 'kegiatan', align: 'right' },
-];
-const dialogInternUmatColumns = [
-    { header: 'Agama', key: 'agama' },
-    { header: 'Jumlah Kegiatan', key: 'kegiatan', align: 'right' },
-];
-const qariHafidzColumns = [
-    { header: 'Kategori', key: 'kategori' },
-    { header: 'Laki-laki', key: 'lk', align: 'right' },
-    { header: 'Perempuan', key: 'pr', align: 'right' },
-    { header: 'Total', key: 'total', align: 'right' },
-];
-
-
-// --- 3. Komponen Angka Animasi ---
-const AnimatedNumber = ({ value }) => {
-  const ref = useRef(null); const isInView = useInView(ref, { once: true, margin: "-50px" });
-  useEffect(() => { if (isInView && ref.current) { animate(0, value, { duration: 1.5, ease: "easeOut", onUpdate: (latest) => { if (ref.current) ref.current.textContent = Math.round(latest).toLocaleString('id-ID'); }, }); } else if (ref.current) { ref.current.textContent = value.toLocaleString('id-ID'); } }, [isInView, value]);
-  return <span ref={ref}>{value.toLocaleString('id-ID')}</span>;
-};
-
-// --- 4. Komponen Kartu KPI ---
-const KpiCard = ({ icon, title, value, color, theme, small = false }) => {
-  const cardVariant = { hidden: { opacity: 0, y: -20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } } };
-  const cardBgColor = theme === 'dark' ? 'rgba(30, 41, 59, 0.5)' : 'rgba(255, 255, 255, 0.6)';
-  const cardBorderColor = theme === 'dark' ? 'rgba(74, 222, 128, 0.2)' : 'rgba(21, 128, 61, 0.2)';
-
-  return ( <motion.div variants={cardVariant} className={`relative w-full overflow-hidden rounded-lg backdrop-blur-md border ${small ? 'p-3' : 'p-5'}`} style={{ backgroundColor: cardBgColor, borderColor: cardBorderColor }} >
-      <div className={`flex items-center ${small ? 'space-x-3' : 'space-x-4'}`}>
-        <div className={`flex-shrink-0 rounded-lg flex items-center justify-center ${small ? 'w-8 h-8' : 'w-10 h-10'}`} style={{ background: `linear-gradient(135deg, ${color}66 0%, ${color}99 100%)` }}>
-          {React.cloneElement(icon, { style: { color: 'white' }, className: small ? "w-4 h-4" : "w-5 h-5" })}
+  return (
+    <motion.div
+      variants={cardVariant}
+      className={`relative w-full overflow-hidden rounded-2xl p-5 shadow-lg`}
+      style={{ background: cardBackground }}
+      whileHover={{ scale: 1.03 }}
+      transition={{ type: "spring", stiffness: 300, damping: 15 }}
+    >
+      <div className="flex items-center space-x-4">
+        <div className="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: `${color}20` }}>
+          {React.cloneElement(icon, { style: { color: color }, className: "w-6 h-6" })}
         </div>
         <div>
-          <h3 className={`font-medium uppercase tracking-wider ${small ? 'text-xs' : 'text-sm'} ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>{title}</h3>
-          <p className={`font-bold ${small ? 'text-xl' : 'text-2xl'} ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`} style={{ color: color }}> <AnimatedNumber value={value} /> </p>
+          <h3 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{title}</h3>
+          <p className={`text-3xl font-bold ${theme === 'dark' ? 'text-gray-200' : 'text-gray-700'}`} style={{ color: color }}>
+            <AnimatedNumber value={value} isDecimal={isDecimal} />
+            {suffix && <span className="text-xl ml-1">{suffix}</span>}
+          </p>
         </div>
       </div>
-    </motion.div> );
+    </motion.div>
+  );
 };
 
-// --- 5. Komponen Kartu Chart ---
+// --- 5. Komponen Kartu Chart (Gaya Kependudukan) ---
 const ChartCard = ({
     title,
     csvData,
@@ -502,18 +191,54 @@ const ChartCard = ({
     csvData.forEach(row => { const rowValues = keys.map(key => { let val = row[key]; val = val === null || val === undefined ? '' : val; if (typeof val === 'string' && val.includes(',')) return `"${val}"`; return val; }); csvContent += rowValues.join(",") + "\n"; });
     const encodedUri = encodeURI(csvContent); const link = document.createElement("a"); link.setAttribute("href", encodedUri); link.setAttribute("download", csvFilename || "data.csv"); document.body.appendChild(link); link.click(); document.body.removeChild(link);
    };
-  const cardBgColor = theme === 'dark' ? 'rgba(16, 40, 32, 0.3)' : 'rgba(240, 255, 244, 0.4)';
-  const cardBorderColor = theme === 'dark' ? 'rgba(52, 211, 153, 0.1)' : 'rgba(34, 197, 94, 0.1)';
-  const legendColor = theme === 'dark' ? '#9ca3af' : '#6b7280';
-  const textLabelColor = theme === 'dark' ? '#A3BFB7' : '#374151';
+  
+  // Gaya dari Kependudukan
+  const cardBgColor = theme === 'dark' ? '#2E1A47' : '#FFFFFF';
+  const titleColor = theme === 'dark' ? 'text-white' : 'text-gray-900';
+  const downloadButtonColor = theme === 'dark' 
+      ? 'bg-purple-500 text-gray-900 hover:bg-purple-400 focus:ring-purple-400 focus:ring-offset-gray-800' 
+      : 'bg-purple-600 text-white hover:bg-purple-700 focus:ring-purple-600 focus:ring-offset-white';
+  
+  const legendColor = theme === 'dark' ? '#D1D5DB' : '#374151';
+  const textLabelColor = theme === 'dark' ? '#D1D5DB' : '#374151';
   const gridColor = theme === 'dark' ? '#4B5563' : '#E5E7EB';
+
+  // Definisikan palet warna di dalam komponen agar 'theme' bisa diakses
+  const COLORS_AGAMA = theme === 'dark' 
+    ? ["#34D399", "#60A5FA", "#A78BFA", "#F59E0B", "#EF4444", "#9CA3AF"]
+    : ["#059669", "#2563EB", "#7C3AED", "#D97706", "#DC2626", "#6B7280"];
+  
+  const COLORS_DEFAULT = theme === 'dark'
+    ? ["#a78bfa", "#f472b6", "#60a5fa", "#34d399", "#f59e0b", "#9ca3af", "#ef4444", "#fcd34d"]
+    : ["#7c3aed", "#db2777", "#2563eb", "#059669", "#d97706", "#6b7280", "#dc2626", "#f59e0b"];
+
+
+  const getColors = (type) => {
+    switch (type) {
+      case 'agama': return COLORS_AGAMA;
+      case 'rumah_ibadah': return COLORS_DEFAULT;
+      case 'tipologi': return COLORS_DEFAULT;
+      case 'penyuluh_tunjangan': return COLORS_AGAMA;
+      case 'sasaran_penyuluhan': return COLORS_AGAMA;
+      case 'kua': return COLORS_DEFAULT;
+      case 'penghulu': return COLORS_DEFAULT;
+      case 'nikah_tempat': return [COLORS_DEFAULT[1], COLORS_DEFAULT[0]];
+      case 'kua_tanah': return [COLORS_DEFAULT[4], COLORS_DEFAULT[3]]; // Merah, Oranye
+      case 'kua_bangunan': return [COLORS_DEFAULT[3], COLORS_DEFAULT[4], COLORS_DEFAULT[6]]; // Hijau, Oranye, Merah
+      case 'kua_revitalisasi': return [COLORS_DEFAULT[2], COLORS_DEFAULT[0]]; // Biru, Ungu
+      case 'wakaf_status': return [COLORS_DEFAULT[6], COLORS_DEFAULT[3]]; // Merah, Hijau
+      case 'wakaf_manfaat': return COLORS_DEFAULT;
+      default: return COLORS_DEFAULT;
+    }
+  }
+  const chartColors = getColors(chartType);
 
   const ToggleButton = ({ type, Icon }) => (
     <button
       onClick={() => onToggle(type)}
       className={`p-1 rounded ${currentView === type
-        ? (theme === 'dark' ? 'bg-green-700/60 text-green-100' : 'bg-green-100 text-green-700')
-        : (theme === 'dark' ? 'text-gray-500 hover:bg-gray-700/40 hover:text-green-300' : 'text-gray-400 hover:bg-gray-100/50 hover:text-green-600')
+        ? (theme === 'dark' ? 'bg-purple-600 text-white' : 'bg-purple-600 text-white')
+        : (theme === 'dark' ? 'text-gray-400 hover:bg-gray-700/40' : 'text-gray-500 hover:bg-gray-100/50')
       } transition-colors`}
       aria-label={`Ubah ke ${type} chart`}
     >
@@ -522,19 +247,21 @@ const ChartCard = ({
   );
 
   return (
-    <motion.div variants={itemVariant} className={`rounded-lg backdrop-blur-sm border overflow-hidden ${className}`} style={{ backgroundColor: cardBgColor, borderColor: cardBorderColor }} >
+    <motion.div variants={itemVariant} className={`rounded-2xl shadow-xl overflow-hidden ${className}`} style={{ backgroundColor: cardBgColor }} >
       <div className="p-4 sm:p-5">
-        <h3 className={`text-md font-semibold mb-3 ${theme === 'dark' ? 'text-green-100' : 'text-green-900'}`}> {title} </h3>
         <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+          <h3 className={`text-md font-semibold ${titleColor}`}> {title} </h3>
+          <div className="flex items-center gap-2">
             {allowToggle && (
-              <div className="flex space-x-1 p-0.5 rounded backdrop-blur-sm order-1 sm:order-none" style={{backgroundColor: theme === 'dark' ? 'rgba(51, 65, 85, 0.3)' : 'rgba(255, 255, 255, 0.3)'}}>
+              <div className={`flex space-x-1 p-0.5 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'}`}>
                 <ToggleButton type="pie" Icon={PieIcon} />
                 <ToggleButton type="bar" Icon={BarIcon} />
               </div>
             )}
-            <button onClick={handleDownloadCSV} className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium transition-colors border order-2 sm:order-none ${theme === 'dark' ? 'bg-green-900/30 border-green-700/50 text-green-300 hover:bg-green-800/50 hover:border-green-600/50' : 'bg-green-50 border-green-200 text-green-700 hover:bg-green-100'}`} >
+            <button onClick={handleDownloadCSV} className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium transition-colors border ${downloadButtonColor}`} >
               <DownloadIcon className="w-3 h-3" /> Download CSV
             </button>
+          </div>
         </div>
         <div className="h-56 sm:h-64 min-w-0">
            {/* Pie Chart */}
@@ -543,7 +270,7 @@ const ChartCard = ({
                     <PieChart>
                         <Pie data={csvData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius="80%">
                             {csvData.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={entry.color || COLORS_AGAMA[index % COLORS_AGAMA.length]} />
+                                <Cell key={`cell-${index}`} fill={entry.color || chartColors[index % chartColors.length]} />
                             ))}
                         </Pie>
                         <Tooltip content={<CustomTooltip theme={theme} chartType="pie" />} />
@@ -573,7 +300,7 @@ const ChartCard = ({
                             <Tooltip content={<CustomTooltip theme={theme} chartType="bar" />} />
                             <Bar dataKey="value" name="Jumlah">
                                 {csvData.map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={entry.color || COLORS_AGAMA[index % COLORS_AGAMA.length]} />
+                                    <Cell key={`cell-${index}`} fill={entry.color || chartColors[index % chartColors.length]} />
                                 ))}
                             </Bar>
                         </BarChart>
@@ -586,15 +313,15 @@ const ChartCard = ({
                     <AreaChart data={csvData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
                         <defs>
                             <linearGradient id="colorNikahArea" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8}/>
-                                <stop offset="95%" stopColor="#8884d8" stopOpacity={0}/>
+                                <stop offset="5%" stopColor="#a78bfa" stopOpacity={0.8}/>
+                                <stop offset="95%" stopColor="#f472b6" stopOpacity={0}/>
                             </linearGradient>
                         </defs>
                         <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
                         <XAxis dataKey="bulan" tick={{ fill: textLabelColor, fontSize: 12 }} />
                         <YAxis tick={{ fill: textLabelColor, fontSize: 12 }} />
                         <Tooltip content={<CustomTooltip theme={theme} chartType="area"/>} />
-                        <Area type="monotone" dataKey="total" name="Jumlah Nikah" stroke="#8884d8" strokeWidth={2} fillOpacity={1} fill="url(#colorNikahArea)" activeDot={{ r: 6 }} />
+                        <Area type="monotone" dataKey="total" name="Jumlah Nikah" stroke="#a78bfa" strokeWidth={2} fillOpacity={1} fill="url(#colorNikahArea)" activeDot={{ r: 6 }} />
                     </AreaChart>
                 </ResponsiveContainer>
             )}
@@ -604,34 +331,40 @@ const ChartCard = ({
   );
 };
 
-// --- 6. Komponen Tombol Filter ---
+// --- 6. Komponen Tombol Filter (Gaya Kependudukan) ---
 const FilterButton = ({ text, icon, onClick, isActive, theme }) => {
-    const activeBg = theme === 'dark' ? 'bg-green-700/50' : 'bg-green-100';
-    const activeText = theme === 'dark' ? 'text-green-200' : 'text-green-800';
-    const inactiveText = theme === 'dark' ? 'text-gray-400 hover:text-green-300' : 'text-gray-500 hover:text-green-700';
-    const inactiveBgHover = theme === 'dark' ? 'hover:bg-gray-700/30' : 'hover:bg-gray-100/50';
+    const activeBg = theme === 'dark' ? 'bg-purple-600' : 'bg-purple-600';
+    const activeText = theme === 'dark' ? 'text-white' : 'text-white';
+    const inactiveText = theme === 'dark' ? 'text-gray-300 hover:text-white' : 'text-gray-700 hover:text-black';
+    const inactiveBgHover = theme === 'dark' ? 'hover:bg-gray-700/40' : 'hover:bg-gray-100/60';
 
-    return ( <motion.button onClick={onClick} className={`w-full flex items-center gap-3 px-4 py-3 rounded-md font-medium text-left transition-all duration-200 relative ${isActive ? `${activeBg} ${activeText}` : `${inactiveText} ${inactiveBgHover}`}`} whileTap={{ scale: 0.98 }} >
-            {isActive && ( <motion.div layoutId="filter-highlight-keagamaan-side" className="absolute left-0 top-0 bottom-0 w-1 bg-green-500 rounded-r-full" transition={{ type: "spring", stiffness: 500, damping: 30 }} /> )}
+    return ( <motion.button onClick={onClick} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-left transition-all duration-200 relative ${isActive ? `${activeBg} ${activeText}` : `${inactiveText} ${inactiveBgHover}`}`} whileTap={{ scale: 0.98 }} >
+            {isActive && ( <motion.div layoutId="filter-highlight-keagamaan-side" className="absolute left-0 top-0 bottom-0 w-1 bg-yellow-400 rounded-r-full" transition={{ type: "spring", stiffness: 500, damping: 30 }} /> )}
             {React.cloneElement(icon, { className: "w-5 h-5 flex-shrink-0" })}
             <span className="text-sm">{text}</span>
         </motion.button> );
 };
 
-// --- 7. Komponen Tooltip Kustom ---
+// --- 7. Komponen Tooltip Kustom (Gaya Kependudukan) ---
 const CustomTooltip = ({ active, payload, label, theme, chartType = 'pie' }) => {
   if (active && payload && payload.length) {
     const data = payload[0]; const item = data.payload.payload || data.payload; const name = label || item.name; const value = data.value;
-    return ( <div className={`rounded-md p-2.5 shadow-lg backdrop-blur-sm ${theme === 'dark' ? 'bg-slate-800/80 border border-slate-700/50' : 'bg-white/80 border border-gray-200/50'}`}>
-        <p className={`font-semibold text-sm mb-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{name}</p>
+    
+    // Gaya dari Kependudukan
+    const baseClasses = `rounded-lg p-3 shadow-lg ${theme === 'dark' ? 'bg-[#2E1A47] border border-gray-700' : 'bg-white border border-gray-200'}`;
+    const titleClasses = `font-semibold text-sm mb-1 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`;
+    const textClasses = `text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`;
+
+    return ( <div className={baseClasses}>
+        <p className={titleClasses}>{name}</p>
         {(chartType === 'area' || chartType === 'line') && payload.map((p, index) => (
-             <p key={index} className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}> Jumlah: {p.value.toLocaleString('id-ID')} </p>
+             <p key={index} className={textClasses}> Jumlah: {p.value.toLocaleString('id-ID')} </p>
         ))}
         {chartType !== 'line' && chartType !== 'area' && (
             chartType === 'penyuluh_agama' ? (
                 <>
                     {payload.map((p, index) => (
-                        <p key={index} className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`} style={{ color: p.fill }}> {/* Menggunakan p.fill untuk warna stack */}
+                        <p key={index} className={textClasses} style={{ color: p.fill }}>
                             {p.name}: {p.value.toLocaleString('id-ID')}
                         </p>
                     ))}
@@ -640,38 +373,39 @@ const CustomTooltip = ({ active, payload, label, theme, chartType = 'pie' }) => 
                     </p>
                 </>
             ) : (
-                 <p className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}> Jumlah: {value.toLocaleString('id-ID')} </p>
+                 <p className={textClasses}> Jumlah: {value.toLocaleString('id-ID')} </p>
             )
         )}
-        {chartType === 'pie' && item.percent && ( <p className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}> Persentase: {(item.percent * 100).toFixed(1)}% </p> )}
+        {chartType === 'pie' && item.percent && ( <p className={textClasses}> Persentase: {(item.percent * 100).toFixed(1)}% </p> )}
       </div> );
   } return null;
 };
 
-// --- 8. Komponen Tabel Dinamis ---
+// --- 8. Komponen Tabel Dinamis (Gaya Kependudukan) ---
 const DynamicTable = ({ title, data, columns, theme, className = "" }) => {
-    const tableBg = theme === 'dark' ? 'bg-slate-800/30' : 'bg-white/40';
-    const tableBorder = theme === 'dark' ? 'border-slate-700/50' : 'border-gray-200/50';
-    const headerBg = theme === 'dark' ? 'bg-slate-900/50' : 'bg-gray-50/50';
-    const headerText = theme === 'dark' ? 'text-gray-400' : 'text-gray-500';
-    const rowBorder = theme === 'dark' ? 'divide-slate-700/50' : 'divide-gray-200/50';
-    const rowHover = theme === 'dark' ? 'hover:bg-slate-700/30' : 'hover:bg-gray-50/50';
-    const cellText = theme === 'dark' ? 'text-gray-300' : 'text-gray-600';
+    // Gaya dari Kependudukan
+    const tableBg = theme === 'dark' ? 'bg-gray-900' : 'bg-white';
+    const tableBorder = theme === 'dark' ? 'border-gray-700' : 'border-gray-200';
+    const headerBg = theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50';
+    const headerText = theme === 'dark' ? 'text-gray-300' : 'text-gray-500';
+    const rowBorder = theme === 'dark' ? 'divide-gray-700' : 'divide-gray-200';
+    const rowHover = theme === 'dark' ? 'hover:bg-gray-800' : 'hover:bg-gray-50';
+    const cellText = theme === 'dark' ? 'text-gray-300' : 'text-gray-500';
     const cellTextPrimary = theme === 'dark' ? 'text-white' : 'text-gray-900';
-    const cardBgColor = theme === 'dark' ? 'rgba(16, 40, 32, 0.3)' : 'rgba(240, 255, 244, 0.4)';
-    const cardBorderColor = theme === 'dark' ? 'rgba(52, 211, 153, 0.1)' : 'rgba(34, 197, 94, 0.1)';
+    const cardBgColor = theme === 'dark' ? '#2E1A47' : '#FFFFFF';
+    const cardBorderColor = 'transparent'; // No border
     const itemVariant = { hidden: { opacity: 0, scale: 0.95 }, visible: { opacity: 1, scale: 1, transition: { duration: 0.5, ease: 'easeOut' } } };
 
 
     return (
-        <motion.div variants={itemVariant} className={`rounded-lg backdrop-blur-sm border overflow-hidden ${className}`} style={{ backgroundColor: cardBgColor, borderColor: cardBorderColor }} >
+        <motion.div variants={itemVariant} className={`rounded-2xl shadow-xl overflow-hidden ${className}`} style={{ backgroundColor: cardBgColor, borderColor: cardBorderColor }} >
             <div className="p-4 sm:p-5">
-                 <h3 className={`text-md font-semibold mb-5 ${theme === 'dark' ? 'text-green-100' : 'text-green-900'}`}> {title} </h3>
+                 <h3 className={`text-md font-semibold mb-5 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}> {title} </h3>
                  {(!data || data.length === 0) ? (
                     <p className={`text-center text-sm py-8 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Tidak ada data untuk ditampilkan pada tabel ini.</p>
                  ) : (
                     <div className={`w-full max-h-96 overflow-auto rounded-lg border ${tableBg} ${tableBorder}`}>
-                        <table className="min-w-full divide-y ${rowBorder}">
+                        <table className={`min-w-full divide-y ${rowBorder}`}>
                             <thead className={`sticky top-0 ${headerBg} backdrop-blur-sm`}> <tr> {columns.map((col) => ( <th key={col.key} scope="col" className={`px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider ${headerText} ${col.align === 'right' ? 'text-right' : 'text-left'}`}> {col.header} </th> ))} </tr> </thead>
                             <tbody className={`divide-y ${rowBorder}`}> {data.map((item, index) => ( <tr key={index} className={rowHover}> {columns.map((col) => ( <td key={col.key} className={`px-4 py-2.5 whitespace-nowrap text-sm ${col.align === 'right' ? 'text-right' : 'text-left'} ${col.key === 'name' || col.key === 'bulan' || col.key === 'kua' || col.key === 'agama' ? cellTextPrimary : cellText}`}> {item[col.key] != null ? item[col.key].toLocaleString('id-ID') : '0'} </td> ))} </tr> ))} </tbody>
                         </table>
@@ -686,6 +420,10 @@ const DynamicTable = ({ title, data, columns, theme, className = "" }) => {
 // --- 9. Komponen Utama DataKeagamaan ---
 const DataKeagamaan = () => {
   const { theme } = useTheme();
+  
+  // --- Ambil data dari Redux Store ---
+  const { data, status } = useSelector((state) => state.landingData);
+
   const [filter, setFilter] = useState('penduduk');
 
   // States untuk chart toggles
@@ -703,8 +441,95 @@ const DataKeagamaan = () => {
   const [kuaRevitalisasiView, setKuaRevitalisasiView] = useState('pie');
   const [wakafStatusView, setWakafStatusView] = useState('pie');
   const [wakafPemanfaatanView, setWakafPemanfaatanView] = useState('pie');
+  
+  // --- Latar Belakang & Warna (Gaya Kependudukan) ---
+  const backgroundStyle = theme === 'dark' 
+    ? { backgroundColor: "#210F37" } 
+    : { backgroundColor: "#E4EFE7" };
 
-  // Data formatting untuk charts
+  // --- Loading dan Error State ---
+  if (status === 'loading' || status === 'idle') {
+    return (
+      <div className="w-full min-h-screen flex items-center justify-center p-4 text-center" style={backgroundStyle}>
+        <p className={`text-lg ${theme === 'dark' ? 'text-purple-300' : 'text-gray-700'}`}>
+          Memuat Data Keagamaan...
+        </p>
+      </div>
+    );
+  }
+
+  if (status === 'failed' || !data || !data.keagamaan) {
+    return (
+      <div className="w-full min-h-screen flex items-center justify-center p-4 text-center" style={backgroundStyle}>
+        <p className={`text-lg ${theme === 'dark' ? 'text-red-400' : 'text-red-600'}`}>
+          Gagal memuat Data Keagamaan. Silakan coba muat ulang halaman.
+        </p>
+      </div>
+    );
+  }
+
+  // --- Ambil data dari state Redux (data.keagamaan.data) ---
+  const { 
+    pendudukAgama: dataPendudukAgama,
+    rumahIbadah: dataRumahIbadah,
+    tipologiMasjid: dataTipologiMasjid,
+    penyuluhAgama: dataPenyuluhAgama,
+    penyuluhDetail: dataPenyuluhDetail,
+    penyuluhTunjangan: dataPenyuluhTunjangan,
+    sasaranPenyuluhan: dataSasaranPenyuluhan,
+    kuaTipologi: dataKuaTipologi,
+    kuaStatus: dataKuaStatus,
+    revitalisasiKua: dataRevitalisasiKua,
+    penghuluJabatan: dataPenghuluJabatan,
+    peristiwaNikahTempat: dataPeristiwaNikahTempat,
+    peristiwaNikahBulan: dataPeristiwaNikahBulan,
+    bukuNikah: dataBukuNikah,
+    rujuk, 
+    tanahWakafStatus: dataTanahWakafStatus,
+    tanahWakafPemanfaatan: dataTanahWakafPemanfaatan,
+    tanahWakafProduktif, 
+    balaiNikah: dataBalaiNikah,
+    penghuluPembinaan: dataPenghuluPembinaan,
+    kasusKonflik: dataKasusKonflik,
+    kasusKonfrontatif: dataKasusKonfrontatif,
+    dialogAntarUmat: dataDialogAntarUmat,
+    dialogInternUmat: dataDialogInternUmat,
+    qariHafidz: dataQariHafidz
+  } = data.keagamaan.data;
+
+  // --- Hitung ulang total dan data turunan ---
+  const totalPenduduk = dataPendudukAgama.reduce((sum, item) => sum + item.value, 0);
+  const totalRumahIbadah = dataRumahIbadah.reduce((sum, item) => sum + item.value, 0);
+  const totalMasjid = dataTipologiMasjid.reduce((sum, item) => sum + item.value, 0);
+
+  const dataPenyuluhTotal = [
+      { name: "PNS", value: dataPenyuluhAgama.reduce((s, i) => s + (i.pns || 0), 0), color: "#34d399" },
+      { name: "PPPK", value: dataPenyuluhAgama.reduce((s, i) => s + (i.pppk || 0), 0), color: "#60a5fa" },
+      { name: "Non ASN", value: dataPenyuluhAgama.reduce((s, i) => s + (i.nonasn || 0), 0), color: "#f59e0b" },
+  ];
+  const totalPenyuluh = dataPenyuluhTotal.reduce((sum, item) => sum + item.value, 0);
+  
+  const totalPenyuluhTunjangan = dataPenyuluhTunjangan.reduce((sum, item) => sum + item.value, 0);
+  const totalSasaranPenyuluhan = dataSasaranPenyuluhan.reduce((sum, item) => sum + item.value, 0);
+  const totalKUA = dataKuaTipologi.reduce((sum, item) => sum + item.value, 0);
+  const totalPenghulu = dataPenghuluJabatan.reduce((sum, item) => sum + item.value, 0);
+  const totalNikahBulanIni = dataPeristiwaNikahBulan.reduce((sum, item) => sum + item.total, 0);
+
+  // Perbaikan untuk data Rujuk agar totalnya sesuai dengan 6 bulan yang ditampilkan
+  const dataRujuk = {
+      totalRujuk: rujuk.totalRujuk,
+      rincian: rujuk.rincian.map(kua => ({
+          ...kua,
+          total: (kua.jan || 0) + (kua.feb || 0) + (kua.mar || 0) + (kua.apr || 0) + (kua.mei || 0) + (kua.jun || 0)
+      }))
+  };
+  const totalPeristiwaRujuk = dataRujuk.totalRujuk; // Total keseluruhan tetap dari JSON
+  
+  const totalTanahWakafPemanfaatan = dataTanahWakafPemanfaatan.reduce((sum, item) => sum + item.value, 0);
+  const totalTanahWakafProduktif = tanahWakafProduktif; // Ini adalah angka, bukan array
+  const totalPenghuluPembinaan = dataPenghuluPembinaan.reduce((sum, item) => sum + item.value, 0);
+
+  // Data formatting untuk charts (yang bergantung pada data Redux)
   const dataNikahTempatArray = [
     { name: 'Luar KUA', value: dataPeristiwaNikahTempat.luar, color: "#3B82F6" },
     { name: 'Di KUA', value: dataPeristiwaNikahTempat.kua, color: "#10B981" },
@@ -722,20 +547,23 @@ const DataKeagamaan = () => {
      { name: 'Rehab Ringan', value: dataRevitalisasiKua.rehabRingan, color: "#3B82F6" },
      { name: 'Rehab Berat', value: dataRevitalisasiKua.rehabBerat, color: "#A78BFA" },
   ];
-   const penyuluhDetailArray = Object.keys(dataPenyuluhDetail).map(key => {
+  const penyuluhDetailArray = Object.keys(dataPenyuluhDetail).map(key => {
         const item = dataPenyuluhDetail[key];
-        const totalGender = (item.gender.laki || 0) + (item.gender.perempuan || 0);
-        const totalStatus = (item.status?.asn || 0) + (item.status?.nonAsn || 0);
+        if (!item) return null; 
+        const laki = item.gender?.laki || 0;
+        const perempuan = item.gender?.perempuan || 0;
+        const asn = item.status?.asn || 0;
+        const nonAsn = item.status?.nonAsn || 0;
         return {
           agama: key.charAt(0).toUpperCase() + key.slice(1),
-          laki: item.gender.laki || 0,
-          perempuan: item.gender.perempuan || 0,
-          totalGender: totalGender,
-          asn: item.status?.asn || 0,
-          nonAsn: item.status?.nonAsn || 0,
-          totalStatus: totalStatus,
+          laki: laki,
+          perempuan: perempuan,
+          totalGender: laki + perempuan,
+          asn: asn,
+          nonAsn: nonAsn,
+          totalStatus: asn + nonAsn,
         };
-    });
+    }).filter(Boolean); // Hapus item null jika ada
 
 
   const filters = [
@@ -748,32 +576,53 @@ const DataKeagamaan = () => {
   const containerVariant = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 0.5, staggerChildren: 0.1 } } };
   const itemVariant = { hidden: { opacity: 0, y: 15 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } } };
   const chartSectionVariant = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 0.4, ease: 'easeOut', staggerChildren: 0.1 } }, exit: { opacity: 0, transition: { duration: 0.3, ease: 'easeIn' } } };
-  const backgroundStyle = theme === 'dark' ? { background: 'radial-gradient(circle at center top, #210E37 0%, #3F1C80 50%)' } : { background: 'radial-gradient(circle at center top, #f0fdfa 0%, #ccfbf1 100%)' };
 
+  // --- Mulai Render Komponen ---
   return (
-    <motion.div id="data-keagamaan" className="w-full min-h-screen py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden" style={backgroundStyle} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.05 }} variants={containerVariant} >
-      <div className={`absolute top-1/4 left-0 w-80 h-80 rounded-full filter blur-3xl opacity-20 -translate-x-1/2 ${theme === 'dark' ? 'bg-emerald-700' : 'bg-emerald-200'}`}></div>
-      <div className={`absolute bottom-1/4 right-0 w-72 h-72 rounded-full filter blur-3xl opacity-20 translate-x-1/2 ${theme === 'dark' ? 'bg-teal-800' : 'bg-teal-200'}`}></div>
+    <motion.div id="data-keagamaan" className="w-full min-h-screen py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden" 
+      style={backgroundStyle} // Terapkan BG Kependudukan
+      initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.05 }} variants={containerVariant} >
+      
+      {/* Elemen Dekoratif (Gaya Kependudukan) */}
+      <div className={`absolute top-40 left-1/4 w-72 h-72 rounded-full filter blur-3xl opacity-20 -translate-x-1/2 -translate-y-1/3 ${theme === 'dark' ? 'bg-purple-800' : 'bg-purple-200'}`}></div>
+      <div className={`absolute bottom-0 right-1/4 w-80 h-80 rounded-full filter blur-3xl opacity-15 translate-x-1/2 translate-y-1/3 ${theme === 'dark' ? 'bg-pink-700' : 'bg-pink-100'}`}></div>
+
       <div className="mx-auto md:mx-12 relative z-10">
         <motion.div className="text-center mb-10" variants={itemVariant} >
-          <h2 style={{ lineHeight: '1.2' }} className={`text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r pb-2 ${theme === 'dark' ? 'from-emerald-300 to-teal-400' : 'from-emerald-600 to-teal-700'}`}> Data Keagamaan </h2>
-          <p className={`mt-3 text-lg max-w-2xl mx-auto ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}> Statistik penduduk, rumah ibadah, penyuluh agama, layanan KUA, dan wakaf di Kota Medan. </p>
+          {/* Judul (Gaya Kependudukan) */}
+          <h2 style={{ lineHeight: '1.2' }} className={`text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r pb-2 ${theme === 'dark' ? 'from-purple-400 to-pink-500' : 'from-emerald-700 to-green-900'}`}> 
+            Data Keagamaan 
+          </h2>
+          <p className={`mt-3 text-lg max-w-2xl mx-auto ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}> 
+            Statistik penduduk, rumah ibadah, penyuluh agama, layanan KUA, dan wakaf di Kota Medan. 
+          </p>
         </motion.div>
+        
+        {/* KPI Cards (Gaya Kependudukan) */}
         <motion.div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-10" variants={containerVariant}>
-            <KpiCard title="Total Penduduk" value={totalPenduduk} icon={<ReligionIcon />} color={theme === 'dark' ? "#6ee7b7" : "#059669"} theme={theme} />
-            <KpiCard title="Total Masjid" value={totalMasjid} icon={<MosqueIcon />} color={theme === 'dark' ? "#5eead4" : "#0d9488"} theme={theme} />
-            <KpiCard title="Total Penyuluh" value={totalPenyuluh} icon={<CounselorIcon />} color={theme === 'dark' ? "#67e8f9" : "#0891b2"} theme={theme} />
+            {/* Mengganti warna agar sesuai tema Kependudukan (Ungu/Pink) */}
+            <KpiCard title="Total Penduduk" value={totalPenduduk} icon={<ReligionIcon />} color={theme === 'dark' ? "#a78bfa" : "#8b5cf6"} theme={theme} />
+            <KpiCard title="Total Masjid" value={totalMasjid} icon={<MosqueIcon />} color={theme === 'dark' ? "#f472b6" : "#db2777"} theme={theme} />
+            <KpiCard title="Total Penyuluh" value={totalPenyuluh} icon={<CounselorIcon />} color={theme === 'dark' ? "#a78bfa" : "#8b5cf6"} theme={theme} />
         </motion.div>
+        
+        {/* Layout Utama (Gaya Kependudukan) */}
         <div className="flex flex-col md:flex-row gap-8">
+            {/* Sidebar Filter (Gaya Kependudukan) */}
             <motion.div className="w-full md:w-1/4 lg:w-1/5" variants={itemVariant}>
-                <div className={`rounded-lg p-3 space-y-2 backdrop-blur-sm border ${theme === 'dark' ? 'bg-slate-800/40 border-slate-700/50' : 'bg-white/50 border-gray-200/50'}`}>
-                    <h4 className={`px-2 text-xs font-semibold uppercase tracking-wider mb-1 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Kategori Data</h4>
+                <div className={`rounded-2xl p-4 space-y-2 shadow-xl ${theme === 'dark' ? 'bg-[#2E1A47]' : 'bg-white'}`}>
+                    <h4 className={`px-2 text-xs font-semibold uppercase tracking-wider mb-1 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Kategori Data</h4>
                     <p className={`px-2 text-xs mb-3 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Pilih kategori untuk melihat detail data.</p>
-                    {filters.map(f => ( <FilterButton key={f.key} text={f.text} icon={f.icon} onClick={() => setFilter(f.key)} isActive={filter === f.key} theme={theme} /> ))}
+                    {filters.map(f => ( 
+                        <FilterButton key={f.key} text={f.text} icon={f.icon} onClick={() => setFilter(f.key)} isActive={filter === f.key} theme={theme} /> 
+                    ))}
                 </div>
             </motion.div>
+            
+            {/* Konten Utama */}
             <div className="w-full md:w-3/4 lg:w-4/5">
                 <AnimatePresence mode="wait">
+                    {/* --- Konten dinamis di-render di sini --- */}
                     {filter === 'penduduk' && (
                         <motion.div key="penduduk" variants={chartSectionVariant} initial="hidden" animate="visible" exit="exit" className="grid grid-cols-1 md:grid-cols-2 gap-6" >
                             <ChartCard
@@ -936,11 +785,11 @@ const DataKeagamaan = () => {
                      {filter === 'wakaf' && (
                          <motion.div key="wakaf" variants={chartSectionVariant} initial="hidden" animate="visible" exit="exit" className="grid grid-cols-1 md:grid-cols-2 gap-6" >
                             <KpiCard title="Tanah Wakaf Produktif" value={totalTanahWakafProduktif} icon={<ArchiveBoxIcon />} color={theme === 'dark' ? "#e879f9" : "#c026d3"} theme={theme} />
-                            <div /> {/* Spacer */}
+                            <KpiCard title="Total Peristiwa Rujuk" value={totalPeristiwaRujuk} icon={<NoSymbolIcon />} color={theme === 'dark' ? "#fde047" : "#ca8a04"} theme={theme} />
                              <ChartCard
-                                title={`Status Tanah Wakaf (Total: ${dataTanahWakafStatus.total.toLocaleString('id-ID')} m²)`}
+                                title={`Status Tanah Wakaf (Total: ${dataTanahWakafStatus.total.toLocaleString('id-ID')})`}
                                 csvData={[{name: 'Belum Sertifikat', value: dataTanahWakafStatus.belum, color: "#f87171"}, {name: 'Sudah Sertifikat', value: dataTanahWakafStatus.sudah, color: "#4ade80"}]}
-                                csvColumns={[{ header: 'Status', key: 'name' }, { header: 'Luas (m²)', key: 'value', align: 'right' }]} csvFilename="wakaf_status.csv"
+                                csvColumns={[{ header: 'Status', key: 'name' }, { header: 'Jumlah', key: 'value', align: 'right' }]} csvFilename="wakaf_status.csv"
                                 allowToggle={true}
                                 currentView={wakafStatusView}
                                 onToggle={setWakafStatusView}
