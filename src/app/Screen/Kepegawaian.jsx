@@ -110,7 +110,7 @@ const AnimatedNumber = ({ value, isDecimal = false }) => {
 };
 
 // --- 4. Komponen Kartu KPI (Gaya Kependudukan) ---
-const KpiCard = ({ icon, title, value, color, theme, suffix = "", isDecimal = false }) => {
+const KpiCard = ({ icon, title, value, color, theme, suffix = "", isDecimal = false, link }) => {
   const cardVariant = {
     hidden: { opacity: 0, y: 30 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } }
@@ -127,6 +127,7 @@ const KpiCard = ({ icon, title, value, color, theme, suffix = "", isDecimal = fa
       style={{ background: cardBackground }}
       whileHover={{ scale: 1.03 }}
       transition={{ type: "spring", stiffness: 300, damping: 15 }}
+      onClick={() => link && window.open(link, "_blank")}
     >
       <div className="flex items-center space-x-4">
         <div className="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: `${color}20` }}>
@@ -363,8 +364,8 @@ const Kepegawaian = () => {
   const totalSatker = dataSatuanKerja.reduce((acc, curr) => acc + curr.value, 0);
 
   const kpiData = [
-    { title: "Total PNS", value: totalPNS, icon: <UsersIcon />, color: "#34D399" },
-    { title: "Total PPPK", value: totalPPPK, icon: <PppkIcon />, color: "#60A5FA" },
+    { title: "Total PNS", value: totalPNS, icon: <UsersIcon />, color: "#34D399", link: "https://drive.google.com/file/d/10BcCzj1yLRIEyZGbmBqIQpNDN9QhwVRQ/view"},
+    { title: "Total PPPK", value: totalPPPK, icon: <PppkIcon />, color: "#60A5FA", link: "https://drive.google.com/file/d/1iO-jVwr6WTOEXoHkGYDk_tPYzEX4x3Zp/view" },
     { title: "Satuan Kerja", value: totalSatker, icon: <SatkerIcon />, color: "#F59E0B" },
   ];
 
@@ -442,6 +443,7 @@ const Kepegawaian = () => {
               icon={item.icon}
               color={item.color}
               theme={theme}
+              link={item.link}
             />
           ))}
         </motion.div>
@@ -464,23 +466,6 @@ const Kepegawaian = () => {
                   theme={theme} 
                 />
               ))}
-
-              {/* --- Tombol GDrive (BARU) --- */}
-              <div className="pt-4 mt-2 border-t border-gray-200 dark:border-gray-700/50">
-                <h4 className={`px-2 text-xs font-semibold uppercase tracking-wider mb-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>Data Eksternal</h4>
-                <LinkButton
-                    text="Data PNS (G-Drive)"
-                    icon={<BookOpenIcon />}
-                    href="https://drive.google.com/file/d/10BcCzj1yLRIEyZGbmBqIQpNDN9QhwVRQ/view"
-                    theme={theme}
-                />
-                <LinkButton
-                    text="Data PPPK (G-Drive)"
-                    icon={<BookOpenIcon />}
-                    href="https://drive.google.com/file/d/1iO-jVwr6WTOEXoHkGYDk_tPYzEX4x3Zp/view"
-                    theme={theme}
-                />
-              </div>
             </div>
           </motion.div>
 
